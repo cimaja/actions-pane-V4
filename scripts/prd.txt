@@ -1,0 +1,59 @@
+# Power Automate Desktop - Actions Pane V4 Redesign
+
+## Project Overview
+This project aims to build a prototype for the redesigned Actions Pane in Power Automate Desktop, including its interaction with a Library Modal for managing built-in actions, connectors, custom actions, UI collections, and templates. The design prioritizes clarity, scalability, and user-friendly interaction using Fluent Design System components.
+
+## Key Components
+
+### 1. Actions Pane Layout
+- Resizable panel (default: ~360px, min: ~320px, max: ~592px)
+- Top section with search input and filter tabs/pills (All, Built-in, Connectors, Favorites)
+- Filter icon for additional sorting/filtering options
+- Default "All" view displaying installed assets grouped under headers
+- Preloaded default modules across categories (Connectors, Files, Interaction, Logic, System)
+- Support for sub-groups within built-in modules
+- Favorites tab showing only starred actions
+
+### 2. Library Entry Point
+- Positioned at the bottom of the Actions Pane
+- Opens the full Library Modal for action/module/template management
+
+### 3. Library Modal
+- Left navigation pane with categories (Built-in Actions, Connectors, Custom Actions, UI Collections, Templates)
+- Content area displaying filtered items with logos, titles, and install status
+- Detail view for each asset type
+- Independent search functionality for each tab
+
+### 4. Detail Views
+- Module/Connector view: Logo, title, install/uninstall button, action list
+- Custom Actions view: Logo, title, author info, description, install toggle
+- UI Collections view: Logo, title, item count, contained elements
+- Templates view: Title, description, author info, dependencies, preview
+
+### 5. UX Considerations
+- Actions Pane shows only installed/available items
+- Personalization through Library
+- Favoriting available on individual actions only
+- Tooltips for descriptions
+- Default items for first-time experience
+- "See all" links to Library with appropriate filters
+- Nested sub-groups for better scannability
+- Fluent Design System implementation
+
+## Technical Requirements
+- Implement using Fluent Design System components
+- Create responsive, resizable panels
+- Implement collapsible groups and sub-groups
+- Build search and filtering functionality
+- Develop favoriting system with persistent state
+- Create modal system for Library and detail views
+- Implement install/uninstall functionality
+- Build tooltip system for descriptions
+
+## Success Metrics
+- Improved discoverability of actions and connectors
+- Reduced time to find and use actions
+- Increased user satisfaction with organization
+- Better scalability for growing action library
+- Improved first-time user experience
+

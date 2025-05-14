@@ -1,0 +1,12 @@
+# Task ID: 4
+# Title: Implement Default View with Grouped Headers
+# Status: in-progress
+# Dependencies: 
+# Priority: medium
+# Description: Develop the default 'All' tab view with grouped headers and item listings
+# Details:
+Create the default view showing all installed assets grouped under headers (Connectors, Files, Interaction, Logic, System). Implement collapsible group headers with icons, titles, and chevrons. Add hover behavior for items with star icon for favoriting actions. Implement tooltips for displaying short descriptions after hover delay.
+
+# Test Strategy:
+Test collapsible behavior of group headers. Verify hover states and favoriting functionality. Check tooltip display with appropriate delay.
+

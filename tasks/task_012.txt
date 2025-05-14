@@ -1,0 +1,12 @@
+# Task ID: 12
+# Title: Develop Detail Views for Library Items
+# Status: pending
+# Dependencies: 
+# Priority: high
+# Description: Implement detailed views for each type of Library item
+# Details:
+Create detail views for Modules/Connectors with logo, title, install/uninstall button, and action list. Implement Custom Actions detail view with logo, title, author info, and install toggle. Develop UI Collections detail view with logo, title, item count, and contained elements. Create Templates detail view with title, description, author info, dependencies, and preview. Add back button functionality to return to list views.
+
+# Test Strategy:
+Test detail view rendering for each item type. Verify back button returns to correct list view. Check that all metadata displays correctly for each item type.
+

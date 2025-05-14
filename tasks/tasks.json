@@ -1,0 +1,196 @@
+{
+  "tasks": [
+    {
+      "id": "1",
+      "title": "Project Setup and Architecture Planning",
+      "status": "pending",
+      "dependencies": [],
+      "priority": "high",
+      "description": "Set up the project structure and plan the architecture for the Actions Pane V4 redesign",
+      "details": "Initialize the project repository with appropriate folder structure. Define the component architecture based on Fluent Design System. Create a plan for state management and data flow. Document the overall architecture decisions and patterns to be used throughout the project.",
+      "testStrategy": "Review architecture documentation for completeness and alignment with requirements. Verify that the project structure supports all required components.",
+      "subtasks": [
+        {
+          "id": "1.1",
+          "title": "Initialize Project Repository",
+          "status": "done",
+          "description": "Set up the initial project structure with necessary configuration files",
+          "details": "Create the project repository with appropriate folder structure. Set up package.json with required dependencies. Configure build tools and development environment. Initialize version control system.",
+          "testStrategy": "Verify that the project structure is created correctly. Ensure all configuration files are properly set up."
+        },
+        {
+          "id": "1.2",
+          "title": "Define Component Architecture",
+          "status": "done",
+          "description": "Design the component architecture based on Fluent Design System",
+          "details": "Identify all required UI components based on the PRD. Create a component hierarchy diagram. Define component interfaces and props. Document component reuse strategy and patterns.",
+          "testStrategy": "Review component architecture for completeness and alignment with requirements. Verify that all required components are identified."
+        },
+        {
+          "id": "1.3",
+          "title": "Create State Management Plan",
+          "status": "done",
+          "description": "Design the state management approach for the application",
+          "details": "Identify all state requirements (UI state, user preferences, data). Define state management patterns and libraries to use. Create diagrams for state flow and data flow. Document state update patterns and side effects handling.",
+          "testStrategy": "Review state management plan for completeness. Verify that all required state is identified and properly managed."
+        },
+        {
+          "id": "1.4",
+          "title": "Design API and Data Models",
+          "status": "done",
+          "description": "Define the data models and API interfaces for the application",
+          "details": "Create data models for all entities (actions, connectors, modules, etc.). Define interfaces for data access and manipulation. Document API requirements for backend integration. Create mock data for development.",
+          "testStrategy": "Review data models and API interfaces for completeness. Verify that all required data can be represented and accessed."
+        },
+        {
+          "id": "1.5",
+          "title": "Document Architecture Decisions",
+          "status": "done",
+          "description": "Create comprehensive architecture documentation",
+          "details": "Document all architecture decisions and patterns. Create diagrams for component structure, state flow, and data flow. Document technical constraints and considerations. Create a development roadmap based on the architecture.",
+          "testStrategy": "Review architecture documentation for completeness and clarity. Ensure all team members understand the architecture decisions."
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "title": "Implement Resizable Actions Pane Container",
+      "status": "done",
+      "dependencies": [],
+      "priority": "high",
+      "description": "Create the main resizable panel for the Actions Pane with appropriate constraints",
+      "details": "Implement a resizable panel with default width of ~360px, minimum width of ~320px, and maximum width of ~500px. Ensure smooth resizing behavior with appropriate handles. Handle edge cases like window resizing and minimum window dimensions. Implement responsive behavior for different screen sizes.",
+      "testStrategy": "Test resizing behavior across different screen sizes. Verify minimum and maximum width constraints are enforced. Check that content adapts appropriately when resized."
+    },
+    {
+      "id": "3",
+      "title": "Develop Top Section UI Components",
+      "status": "done",
+      "dependencies": [],
+      "priority": "high",
+      "description": "Create the search input and filter tabs/pills for the top section of the Actions Pane",
+      "details": "Implement search input field with appropriate styling and behavior. Create filter tabs/pills for navigation (All, Built-in, Connectors, Favorites). Add filter icon for additional sorting/filter options. Ensure responsive behavior for different pane widths.",
+      "testStrategy": "Verify search input field works correctly. Test tab/pill navigation for correct state changes. Ensure filter icon displays additional options correctly."
+    },
+    {
+      "id": "4",
+      "title": "Implement Default View with Grouped Headers",
+      "status": "in-progress",
+      "dependencies": [],
+      "priority": "medium",
+      "description": "Develop the default 'All' tab view with grouped headers and item listings",
+      "details": "Create the default view showing all installed assets grouped under headers (Connectors, Files, Interaction, Logic, System). Implement collapsible group headers with icons, titles, and chevrons. Add hover behavior for items with star icon for favoriting actions. Implement tooltips for displaying short descriptions after hover delay.",
+      "testStrategy": "Test collapsible behavior of group headers. Verify hover states and favoriting functionality. Check tooltip display with appropriate delay."
+    },
+    {
+      "id": "5",
+      "title": "Build Sub-Groups Support for Built-in Modules",
+      "status": "pending",
+      "dependencies": [],
+      "priority": "medium",
+      "description": "Implement support for sub-groups within built-in modules",
+      "details": "Create collapsible sub-groups for organizing large sets of actions. Add action count badges to sub-groups. Implement hover behavior for favoriting individual actions within sub-groups. Ensure proper nesting and visual hierarchy for sub-groups.",
+      "testStrategy": "Test collapsing and expanding of sub-groups. Verify action count badges display correctly. Check that only individual actions can be favorited, not sub-groups."
+    },
+    {
+      "id": "6",
+      "title": "Develop Favorites Tab Functionality",
+      "status": "pending",
+      "dependencies": [],
+      "priority": "medium",
+      "description": "Implement the Favorites tab showing starred actions grouped by their modules",
+      "details": "Create the Favorites tab view showing only starred actions. Group favorited actions under their respective module or connector headers. Implement persistence for favorites across sessions. Add ability to unfavorite actions from within the Favorites tab.",
+      "testStrategy": "Test adding and removing favorites. Verify favorites persist across sessions. Check that favorites are correctly grouped under their module headers."
+    },
+    {
+      "id": "7",
+      "title": "Create Library Entry Point",
+      "status": "pending",
+      "dependencies": [],
+      "priority": "medium",
+      "description": "Implement the Library entry point at the bottom of the Actions Pane",
+      "details": "Create the Library entry point positioned at the bottom of the Actions Pane. Add appropriate labeling with 'Library' text and chevron icon. Implement click behavior to open the full Library Modal. Ensure proper styling and visibility across different pane states.",
+      "testStrategy": "Verify Library entry point is correctly positioned. Test click behavior opens the Library Modal. Check styling across different pane widths."
+    },
+    {
+      "id": "8",
+      "title": "Implement Library Modal Framework",
+      "status": "pending",
+      "dependencies": [],
+      "priority": "high",
+      "description": "Develop the base modal framework for the Library with left navigation and content area",
+      "details": "Create the modal container with appropriate sizing and positioning. Implement left navigation pane with categories (Built-in Actions, Connectors, Custom Actions, UI Collections, Templates). Add content area for displaying filtered items. Implement open/close behavior and animations.",
+      "testStrategy": "Test modal opening and closing. Verify navigation between categories works correctly. Check responsive behavior on different screen sizes."
+    },
+    {
+      "id": "9",
+      "title": "Develop Built-in Actions and Connectors Views",
+      "status": "pending",
+      "dependencies": [],
+      "priority": "medium",
+      "description": "Implement the views for Built-in Actions and Connectors in the Library Modal",
+      "details": "Create list views for Built-in Actions and Connectors categories. Implement item entries with logos, titles, and install status indicators. Add chevron to expand details for each item. Implement filtering and search functionality specific to these categories.",
+      "testStrategy": "Test list view rendering with correct data. Verify expand/collapse behavior works. Check that filtering and search functions correctly."
+    },
+    {
+      "id": "10",
+      "title": "Implement Custom Actions and UI Collections Views",
+      "status": "pending",
+      "dependencies": [],
+      "priority": "medium",
+      "description": "Create the views for Custom Actions and UI Collections in the Library Modal",
+      "details": "Develop list views for Custom Actions and UI Collections categories. Implement item entries with appropriate metadata (author, last updated, size, item count). Add expand/collapse behavior for details. Implement category-specific search functionality.",
+      "testStrategy": "Test list view rendering with correct metadata. Verify expand/collapse behavior works. Check that search functions correctly within each category."
+    },
+    {
+      "id": "11",
+      "title": "Create Templates View",
+      "status": "pending",
+      "dependencies": [],
+      "priority": "medium",
+      "description": "Implement the Templates view in the Library Modal",
+      "details": "Develop the Templates list view with appropriate item rendering. Add template metadata display (title, description, author, dependencies). Implement preview and install functionality. Add category-specific search for templates.",
+      "testStrategy": "Test template list rendering with correct metadata. Verify preview functionality works. Check that install buttons function correctly."
+    },
+    {
+      "id": "12",
+      "title": "Develop Detail Views for Library Items",
+      "status": "pending",
+      "dependencies": [],
+      "priority": "high",
+      "description": "Implement detailed views for each type of Library item",
+      "details": "Create detail views for Modules/Connectors with logo, title, install/uninstall button, and action list. Implement Custom Actions detail view with logo, title, author info, and install toggle. Develop UI Collections detail view with logo, title, item count, and contained elements. Create Templates detail view with title, description, author info, dependencies, and preview. Add back button functionality to return to list views.",
+      "testStrategy": "Test detail view rendering for each item type. Verify back button returns to correct list view. Check that all metadata displays correctly for each item type."
+    },
+    {
+      "id": "13",
+      "title": "Implement Install/Uninstall Functionality",
+      "status": "pending",
+      "dependencies": [],
+      "priority": "high",
+      "description": "Create the functionality to install and uninstall items from the Library",
+      "details": "Implement install/uninstall buttons with appropriate state management. Add visual feedback for installation process. Update Actions Pane content when items are installed or uninstalled. Implement persistence for installed items across sessions.",
+      "testStrategy": "Test install and uninstall functionality for different item types. Verify Actions Pane updates correctly when items are installed/uninstalled. Check that installed state persists across sessions."
+    },
+    {
+      "id": "14",
+      "title": "Develop Tooltip System",
+      "status": "pending",
+      "dependencies": [],
+      "priority": "low",
+      "description": "Implement a tooltip system for displaying descriptions",
+      "details": "Create a tooltip component for displaying short descriptions. Implement hover delay behavior for showing tooltips. Ensure tooltips are positioned correctly relative to their trigger elements. Add support for different tooltip content types (text, rich content).",
+      "testStrategy": "Test tooltip display with appropriate delay. Verify positioning across different screen sizes and positions. Check that tooltip content renders correctly."
+    },
+    {
+      "id": "15",
+      "title": "Integration Testing and Refinement",
+      "status": "pending",
+      "dependencies": [],
+      "priority": "high",
+      "description": "Perform integration testing and refine the overall user experience",
+      "details": "Test the complete end-to-end flow between Actions Pane and Library Modal. Verify all interactions work as expected across different states. Refine animations, transitions, and visual feedback. Optimize performance for smooth user experience. Address any usability issues identified during testing.",
+      "testStrategy": "Conduct end-to-end testing of all user flows. Perform usability testing with representative users. Measure performance metrics and optimize as needed."
+    }
+  ]
+}

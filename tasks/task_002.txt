@@ -1,0 +1,12 @@
+# Task ID: 2
+# Title: Implement Resizable Actions Pane Container
+# Status: done
+# Dependencies: 
+# Priority: high
+# Description: Create the main resizable panel for the Actions Pane with appropriate constraints
+# Details:
+Implement a resizable panel with default width of ~360px, minimum width of ~320px, and maximum width of ~500px. Ensure smooth resizing behavior with appropriate handles. Handle edge cases like window resizing and minimum window dimensions. Implement responsive behavior for different screen sizes.
+
+# Test Strategy:
+Test resizing behavior across different screen sizes. Verify minimum and maximum width constraints are enforced. Check that content adapts appropriately when resized.
+

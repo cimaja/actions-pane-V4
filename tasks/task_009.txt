@@ -1,0 +1,12 @@
+# Task ID: 9
+# Title: Develop Built-in Actions and Connectors Views
+# Status: pending
+# Dependencies: 
+# Priority: medium
+# Description: Implement the views for Built-in Actions and Connectors in the Library Modal
+# Details:
+Create list views for Built-in Actions and Connectors categories. Implement item entries with logos, titles, and install status indicators. Add chevron to expand details for each item. Implement filtering and search functionality specific to these categories.
+
+# Test Strategy:
+Test list view rendering with correct data. Verify expand/collapse behavior works. Check that filtering and search functions correctly.
+

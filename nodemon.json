@@ -1,0 +1,10 @@
+{
+  "watch": ["src"],
+  "ext": "ts,tsx,js,jsx,json",
+  "ignore": ["node_modules", "build"],
+  "exec": "PORT=3003 npm run start",
+  "delay": "1000",
+  "env": {
+    "NODE_ENV": "development"
+  }
+}

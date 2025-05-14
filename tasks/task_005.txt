@@ -1,0 +1,12 @@
+# Task ID: 5
+# Title: Build Sub-Groups Support for Built-in Modules
+# Status: pending
+# Dependencies: 
+# Priority: medium
+# Description: Implement support for sub-groups within built-in modules
+# Details:
+Create collapsible sub-groups for organizing large sets of actions. Add action count badges to sub-groups. Implement hover behavior for favoriting individual actions within sub-groups. Ensure proper nesting and visual hierarchy for sub-groups.
+
+# Test Strategy:
+Test collapsing and expanding of sub-groups. Verify action count badges display correctly. Check that only individual actions can be favorited, not sub-groups.
+

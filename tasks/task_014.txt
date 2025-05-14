@@ -1,0 +1,12 @@
+# Task ID: 14
+# Title: Develop Tooltip System
+# Status: pending
+# Dependencies: 
+# Priority: low
+# Description: Implement a tooltip system for displaying descriptions
+# Details:
+Create a tooltip component for displaying short descriptions. Implement hover delay behavior for showing tooltips. Ensure tooltips are positioned correctly relative to their trigger elements. Add support for different tooltip content types (text, rich content).
+
+# Test Strategy:
+Test tooltip display with appropriate delay. Verify positioning across different screen sizes and positions. Check that tooltip content renders correctly.
+

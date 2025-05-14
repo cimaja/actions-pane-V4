@@ -1,0 +1,12 @@
+# Task ID: 10
+# Title: Implement Custom Actions and UI Collections Views
+# Status: pending
+# Dependencies: 
+# Priority: medium
+# Description: Create the views for Custom Actions and UI Collections in the Library Modal
+# Details:
+Develop list views for Custom Actions and UI Collections categories. Implement item entries with appropriate metadata (author, last updated, size, item count). Add expand/collapse behavior for details. Implement category-specific search functionality.
+
+# Test Strategy:
+Test list view rendering with correct metadata. Verify expand/collapse behavior works. Check that search functions correctly within each category.
+

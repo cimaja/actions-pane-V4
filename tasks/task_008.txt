@@ -1,0 +1,12 @@
+# Task ID: 8
+# Title: Implement Library Modal Framework
+# Status: pending
+# Dependencies: 
+# Priority: high
+# Description: Develop the base modal framework for the Library with left navigation and content area
+# Details:
+Create the modal container with appropriate sizing and positioning. Implement left navigation pane with categories (Built-in Actions, Connectors, Custom Actions, UI Collections, Templates). Add content area for displaying filtered items. Implement open/close behavior and animations.
+
+# Test Strategy:
+Test modal opening and closing. Verify navigation between categories works correctly. Check responsive behavior on different screen sizes.
+

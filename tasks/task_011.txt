@@ -1,0 +1,12 @@
+# Task ID: 11
+# Title: Create Templates View
+# Status: pending
+# Dependencies: 
+# Priority: medium
+# Description: Implement the Templates view in the Library Modal
+# Details:
+Develop the Templates list view with appropriate item rendering. Add template metadata display (title, description, author, dependencies). Implement preview and install functionality. Add category-specific search for templates.
+
+# Test Strategy:
+Test template list rendering with correct metadata. Verify preview functionality works. Check that install buttons function correctly.
+
