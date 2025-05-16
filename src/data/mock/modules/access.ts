@@ -17,35 +17,30 @@ export const actions: ActionItemType[] = [
     id: 'launch-access',
     title: 'Launch Access',
     description: 'Launch Microsoft Access application',
-    icon: 'access20Regular',
     moduleId: 'access'
   },
   {
     id: 'read-access-table',
     title: 'Read Access table',
     description: 'Read data from an Access database table',
-    icon: 'access20Regular',
     moduleId: 'access'
   },
   {
     id: 'run-access-query',
     title: 'Run Access query',
     description: 'Execute a query in an Access database',
-    icon: 'access20Regular',
     moduleId: 'access'
   },
   {
     id: 'run-access-macro',
     title: 'Run Access macro',
     description: 'Execute a macro in an Access database',
-    icon: 'access20Regular',
     moduleId: 'access'
   },
   {
     id: 'close-access',
     title: 'Close Access',
     description: 'Close Microsoft Access application',
-    icon: 'access20Regular',
     moduleId: 'access'
   }
 ];

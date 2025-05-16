@@ -147,11 +147,15 @@ const useStyles = makeStyles({
   },
 });
 
+export type SortOrder = 'name-asc' | 'recent' | 'category';
+
 interface ActionsPaneHeaderProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   searchQuery: string;
   onSearchChange: (query: string) => void;
+  sortOrder: SortOrder;
+  onSortOrderChange: (order: SortOrder) => void;
 }
 
 interface FilterOption {
@@ -160,17 +164,17 @@ interface FilterOption {
   checked: boolean;
 }
 
-type SortOrder = 'name-asc' | 'recent';
-
 export const ActionsPaneHeader: React.FC<ActionsPaneHeaderProps> = ({
   activeTab,
   onTabChange,
   searchQuery,
   onSearchChange,
+  sortOrder,
+  onSortOrderChange,
 }) => {
   const styles = useStyles();
   const [filterMenuOpen, setFilterMenuOpen] = useState<boolean>(false);
-  const [sortOrder, setSortOrder] = useState<SortOrder>('name-asc');
+
   const [filterOptions, setFilterOptions] = useState<FilterOption[]>([
     { id: 'new', label: 'New', checked: false },
     { id: 'premium', label: 'Premium', checked: false },
@@ -190,13 +194,13 @@ export const ActionsPaneHeader: React.FC<ActionsPaneHeaderProps> = ({
   };
 
   const handleSortOrderChange = (order: SortOrder) => {
-    setSortOrder(order);
+    onSortOrderChange(order);
     setFilterMenuOpen(false);
   };
 
   const handleClearFilters = () => {
     setFilterOptions(options => options.map(option => ({ ...option, checked: false })));
-    setSortOrder('name-asc');
+    onSortOrderChange('name-asc');
   };
 
   return (
@@ -301,6 +305,17 @@ export const ActionsPaneHeader: React.FC<ActionsPaneHeaderProps> = ({
                     {sortOrder === 'recent' && <Checkmark20Regular />}
                   </div>
                   <span className={styles.menuItemText}>Most recent</span>
+                </div>
+              </MenuItem>
+              <MenuItem 
+                className={styles.menuItem}
+                onClick={() => handleSortOrderChange('category')}
+              >
+                <div className={styles.menuItemContent}>
+                  <div className={styles.checkIcon}>
+                    {sortOrder === 'category' && <Checkmark20Regular />}
+                  </div>
+                  <span className={styles.menuItemText}>Category</span>
                 </div>
               </MenuItem>
               

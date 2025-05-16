@@ -16,7 +16,7 @@ const documentConversionActions: ActionItemType[] = [
   {
     id: 'convert-document',
     title: 'Convert document',
-    icon: 'documentPdf20Regular',
+
     description: 'Convert documents between different formats',
     moduleId: 'ibm-cognitive'
   }
@@ -27,14 +27,14 @@ const languageTranslatorActions: ActionItemType[] = [
   {
     id: 'translate',
     title: 'Translate',
-    icon: 'translate20Regular',
+
     description: 'Translate text between languages',
     moduleId: 'ibm-cognitive'
   },
   {
     id: 'identify-language',
     title: 'Identify language',
-    icon: 'textT20Regular',
+
     description: 'Identify the language of input text',
     moduleId: 'ibm-cognitive'
   }
@@ -45,7 +45,7 @@ const toneAnalyzerActions: ActionItemType[] = [
   {
     id: 'analyze-tone',
     title: 'Analyze tone',
-    icon: 'emoji20Regular',
+
     description: 'Analyze the tone of text content',
     moduleId: 'ibm-cognitive'
   }
@@ -56,7 +56,7 @@ const visualRecognitionActions: ActionItemType[] = [
   {
     id: 'classify-image',
     title: 'Classify image',
-    icon: 'imageAlt20Regular',
+
     description: 'Classify and analyze image content',
     moduleId: 'ibm-cognitive'
   }

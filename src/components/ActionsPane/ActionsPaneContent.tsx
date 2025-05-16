@@ -12,6 +12,7 @@ import { getIconByName } from '../../utils/iconUtils';
 import { getIconColorClass, getIconBackgroundClass } from '../../utils/iconColorUtils';
 import { ActionItem } from './ActionItem';
 import { TabType } from '../../models/types';
+import { SortOrder } from './ActionsPaneHeader';
 import { dataService } from '../../data/dataService';
 
 const useStyles = makeStyles({
@@ -42,6 +43,7 @@ const useStyles = makeStyles({
     gap: tokens.spacingVerticalXS,
     height: '100%',
     overflow: 'auto',
+    padding: `${tokens.spacingVerticalM} 0`,
   },
   groupContainer: {
     display: 'flex',
@@ -153,11 +155,13 @@ const useStyles = makeStyles({
 interface ActionsPaneContentProps {
   activeTab: string;
   searchQuery: string;
+  sortOrder: SortOrder;
 }
 
 export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
   activeTab,
   searchQuery,
+  sortOrder,
 }) => {
   const styles = useStyles();
   // Initialize all groups as collapsed by default
@@ -165,12 +169,34 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
   // Track favorited items
   const [favoriteItems, setFavoriteItems] = useState<Record<string, boolean>>({});
 
-  // Get filtered groups from the data service
-  const filteredGroups = dataService.getActionsPaneContent(
-    activeTab as TabType,
-    searchQuery,
-    favoriteItems
-  );
+  // Get filtered groups from the data service and apply sorting
+  const filteredGroups = (() => {
+    const groups = dataService.getActionsPaneContent(
+      activeTab as TabType,
+      searchQuery,
+      favoriteItems
+    );
+
+    // Apply sorting based on sortOrder
+    if (sortOrder === 'category' && ['All', 'Built-in'].includes(activeTab)) {
+      return [...groups].sort((a, b) => {
+        // Get the first tag for each group (assuming it's the category)
+        const categoryA = a.tags?.[0] || 'Other';
+        const categoryB = b.tags?.[0] || 'Other';
+        
+        // If categories are the same, sort by title
+        if (categoryA === categoryB) {
+          return a.title.localeCompare(b.title);
+        }
+        
+        // Otherwise, sort by category
+        return categoryA.localeCompare(categoryB);
+      });
+    }
+    
+    // Default sorting (name-asc or recent)
+    return groups;
+  })();
 
   // Toggle group expansion
   const toggleGroup = (groupId: string) => {

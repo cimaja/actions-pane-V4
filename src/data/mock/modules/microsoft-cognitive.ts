@@ -5,7 +5,6 @@ const bingSpellCheckActions: ActionItemType[] = [
   {
     id: 'spell-check',
     title: 'Spell check',
-    icon: 'textSpellingError20Regular',
     description: 'Check text for spelling errors using Bing Spell Check',
     moduleId: 'microsoft-cognitive'
   }
@@ -16,28 +15,24 @@ const computerVisionActions: ActionItemType[] = [
   {
     id: 'analyze-image',
     title: 'Analyze image',
-    icon: 'imageSearch20Regular',
     description: 'Analyze image content and return detailed information',
     moduleId: 'microsoft-cognitive'
   },
   {
     id: 'describe-image',
     title: 'Describe image',
-    icon: 'imageAlt20Regular',
     description: 'Generate a human-readable description of an image',
     moduleId: 'microsoft-cognitive'
   },
   {
     id: 'ocr',
     title: 'OCR',
-    icon: 'scanText20Regular',
     description: 'Extract text from images using OCR',
     moduleId: 'microsoft-cognitive'
   },
   {
     id: 'tag-image',
     title: 'Tag image',
-    icon: 'tag20Regular',
     description: 'Generate tags for the image content',
     moduleId: 'microsoft-cognitive'
   }

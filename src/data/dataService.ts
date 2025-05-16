@@ -113,8 +113,29 @@ export class DataService {
    * Get favorite actions based on user selections
    */
   getFavoriteActions(favoriteItems: Record<string, boolean> = {}): DetailedActionItem[] {
-    // Return user-selected favorites only
-    const allActions = [...this._moduleActions, ...this._connectorActions];
+    // Get all module actions (including those in subgroups)
+    const allModuleActions = this._modules.flatMap(module => {
+      const moduleActions = module.items.map(item => ({
+        ...item,
+        moduleId: module.id
+      }));
+      
+      // Get actions from subgroups
+      const subGroupActions = (module.subGroups || []).flatMap(subGroup => 
+        subGroup.items.map(item => ({
+          ...item,
+          moduleId: module.id,
+          subGroupId: subGroup.id
+        }))
+      );
+      
+      return [...moduleActions, ...subGroupActions];
+    });
+    
+    // Combine with connector actions
+    const allActions = [...allModuleActions, ...this._connectorActions];
+    
+    // Filter favorites
     return allActions.filter(action => favoriteItems[action.id]);
   }
   
@@ -229,17 +250,24 @@ export class DataService {
       
       // Create ActionGroup objects for each module with favorites
       return Object.entries(groupedFavorites).map(([moduleId, items]) => {
-        // Look for module or connector to get proper title
+        // Look for module or connector to get proper title and icon
         const module = this.getModuleById(moduleId);
         const connector = this.getConnectorById(moduleId);
         
         // Use title from module or connector, with a friendly fallback if not found
         const title = module?.title || connector?.title || `Action Group (${moduleId})`;
         
+        // Use icon and iconColor from module or connector
+        const icon = module?.icon || connector?.icon;
+        const iconColor = module?.iconColor || connector?.iconColor;
+        
         return {
           id: moduleId,
           title,
-          items: items
+          icon,
+          iconColor,
+          items: items,
+          tags: module?.tags || connector?.tags || []
         };
       });
     }

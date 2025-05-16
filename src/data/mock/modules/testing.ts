@@ -17,14 +17,12 @@ export const actions: ActionItemType[] = [
     id: 'assert',
     title: 'Assert',
     description: 'Assert a condition and handle success/failure',
-    icon: 'checkmark20Regular',
     moduleId: 'testing'
   },
   {
     id: 'test-desktop-flow',
     title: 'Test desktop flow',
     description: 'Run and validate a desktop flow',
-    icon: 'desktopFlow20Regular',
     moduleId: 'testing'
   }
 ].sort((a, b) => a.title.localeCompare(b.title));

@@ -11,7 +11,6 @@ export const module: ActionGroup = {
     {
       id: 'log-message',
       title: 'Log message',
-      icon: 'documentData',
       description: 'Write a message to the log file'
     }
   ],

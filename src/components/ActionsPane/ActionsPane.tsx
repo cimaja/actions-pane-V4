@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { makeStyles, Divider } from '@fluentui/react-components';
 import { tokens } from '@fluentui/react-theme';
 import { GridDots20Regular } from '@fluentui/react-icons';
-import { ActionsPaneHeader } from './ActionsPaneHeader';
+import { ActionsPaneHeader, SortOrder } from './ActionsPaneHeader';
 import { ActionsPaneContent } from './ActionsPaneContent';
 import { LibraryEntryPoint } from './LibraryEntryPoint';
 
@@ -119,6 +119,7 @@ export const ActionsPane: React.FC = () => {
   const styles = useStyles();
   const [activeTab, setActiveTab] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('category');
   const [width, setWidth] = useState<number>(getSavedWidth());
   const [isResizing, setIsResizing] = useState<boolean>(false);
   const [isAtMinWidth, setIsAtMinWidth] = useState<boolean>(width <= MIN_WIDTH);
@@ -220,6 +221,8 @@ export const ActionsPane: React.FC = () => {
           onTabChange={setActiveTab}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
+          sortOrder={sortOrder}
+          onSortOrderChange={setSortOrder}
         />
         <Divider />
       </div>
@@ -227,6 +230,7 @@ export const ActionsPane: React.FC = () => {
         <ActionsPaneContent 
           activeTab={activeTab}
           searchQuery={searchQuery}
+          sortOrder={sortOrder}
         />
       </div>
       <div className={styles.footer}>
