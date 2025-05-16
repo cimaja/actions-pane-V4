@@ -1,5 +1,6 @@
 import { ActionGroup, LibraryItemType, TabType, LibraryCategoryType, DetailedActionItem } from '../models/types';
 import * as moduleFiles from './mock/modules';
+import { ActionItemType } from '../models/types';
 import * as connectorFiles from './mock/connectors';
 
 /**
@@ -29,7 +30,7 @@ export class DataService {
     
     // Initialize actions from modules
     this._moduleActions = Object.values(moduleFiles).flatMap(moduleFile => 
-      moduleFile.getAllActions().map(action => ({
+      moduleFile.getAllActions().map((action: ActionItemType) => ({
         ...action,
         moduleId: moduleFile.module.id
       }))

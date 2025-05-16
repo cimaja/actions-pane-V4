@@ -4,7 +4,7 @@ import { ActionGroup, ActionItemType } from '../../../models/types';
 export const module: ActionGroup = {
   id: 'browser-automation',
   title: 'Browser automation',
-  icon: 'globe',
+  icon: 'globe24Regular',
   iconColor: 'orange',
   tags: ['Interaction'], // Category tag for this module
   items: [], // This will be populated with references to the actions

@@ -4,11 +4,11 @@ import { ActionGroup, ActionItemType } from '../../../models/types';
 export const module: ActionGroup = {
   id: 'ocr',
   title: 'OCR',
-  icon: 'scanText20Regular',
+  icon: 'scanText24Regular',
   iconColor: 'orange',
   tags: ['Interaction'], // Category tag for this module
   items: [], // This will be populated with references to the actions
-  isInstalled: true // Set the module as installed by default
+  isInstalled: false // Set the module as installed by default
 };
 
 // Module actions

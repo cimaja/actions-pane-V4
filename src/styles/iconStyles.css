@@ -1,0 +1,69 @@
+/* Icon background colors */
+.iconBgAmber {
+  background-color: #FEF3C7; /* Data category */
+}
+.iconBgBlue {
+  background-color: #E0E7FF; /* Integration category */
+}
+.iconBgGreen {
+  background-color: #D1FAE5; /* System category */
+}
+.iconBgPurple {
+  background-color: #F3E8FF; /* Custom actions */
+}
+.iconBgRed {
+  background-color: #FFE4E6; /* Logic category */
+}
+.iconBgOrange {
+  background-color: #FFEDD5; /* Interaction category */
+}
+.iconBgGray {
+  background-color: #F3F4F6;
+}
+.iconBgLightBlue {
+  background-color: #E1F5FE; /* Connectors */
+}
+.iconBgTeal {
+  background-color: #CCFBF1; /* Scripting category */
+}
+.iconBgYellow {
+  background-color: #FEF9C3;
+}
+.iconBgPink {
+  background-color: #FCE7F3;
+}
+
+/* Icon text colors */
+.iconColorAmber {
+  color: #CA5010; /* Data category */
+}
+.iconColorBlue {
+  color: #4F6BED; /* Integration category */
+}
+.iconColorGreen {
+  color: #059669; /* System category */
+}
+.iconColorPurple {
+  color: #881798; /* Custom actions */
+}
+.iconColorRed {
+  color: #E11D48; /* Logic category */
+}
+.iconColorOrange {
+  color: #EA580C; /* Interaction category */
+}
+.iconColorGray {
+  color: #6B7280;
+}
+.iconColorLightBlue {
+  color: #0078D4; /* Connectors */
+}
+.iconColorTeal {
+  color: #00A381; /* Scripting category */
+}
+.iconColorYellow {
+  color: #CA8A04;
+}
+.iconColorPink {
+  color: #DB2777;
+}

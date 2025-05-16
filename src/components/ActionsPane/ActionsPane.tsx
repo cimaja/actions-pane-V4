@@ -68,7 +68,7 @@ const useStyles = makeStyles({
       height: '40px',
       backgroundColor: tokens.colorBrandBackground,
       opacity: 0.3,
-      borderRadius: '2px',
+      borderRadius: '8px',
     },
   },
   resizeHandleAtMax: {
@@ -82,7 +82,7 @@ const useStyles = makeStyles({
       height: '40px',
       backgroundColor: tokens.colorNeutralForeground3,
       opacity: 0.3,
-      borderRadius: '2px',
+      borderRadius: '8px',
     },
   },
   resizeHandleActive: {

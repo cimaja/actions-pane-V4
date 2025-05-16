@@ -4,7 +4,7 @@ import { ActionGroup, ActionItemType } from '../../../models/types';
 export const module: ActionGroup = {
   id: 'terminal-emulation',
   title: 'Terminal emulation',
-  icon: 'windowConsole20Regular',
+  icon: 'code24Regular',
   iconColor: 'teal',
   tags: ['Scripting'], // Category tag for this module
   items: [], // This will be populated with references to the actions

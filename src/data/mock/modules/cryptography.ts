@@ -4,7 +4,7 @@ import { ActionGroup, ActionItemType } from '../../../models/types';
 export const module: ActionGroup = {
   id: 'cryptography',
   title: 'Cryptography',
-  icon: 'lockClosed20Regular',
+  icon: 'lockClosed24Regular',
   iconColor: 'teal',
   tags: ['Scripting'], // Category tag for this module
   items: [], // This will be populated with references to the actions

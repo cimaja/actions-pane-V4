@@ -4,7 +4,7 @@ import { ActionGroup, ActionItemType } from '../../../models/types';
 export const module: ActionGroup = {
   id: 'mouse-and-keyboard',
   title: 'Mouse and keyboard',
-  icon: 'keyboard', // Using keyboard icon for mouse and keyboard module
+  icon: 'Keyboard24Regular', // Using keyboard icon for mouse and keyboard module
   iconColor: 'orange',
   tags: ['Interaction'], // Category tag for this module
   items: [], // This will be populated with references to the actions

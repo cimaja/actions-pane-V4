@@ -8,7 +8,8 @@ import {
   AccordionPanel,
   tokens,
 } from '@fluentui/react-components';
-import { DocumentRegular } from '@fluentui/react-icons';
+import { getIconByName } from '../../utils/iconUtils';
+import { getIconColorClass, getIconBackgroundClass } from '../../utils/iconColorUtils';
 import { ActionItem } from './ActionItem';
 import { TabType } from '../../models/types';
 import { dataService } from '../../data/dataService';
@@ -18,7 +19,7 @@ const useStyles = makeStyles({
     '& .fui-AccordionHeader__button': {
       backgroundColor: 'transparent',
       transition: `background-color ${tokens.durationFaster}`,
-      borderRadius: tokens.borderRadiusMedium,
+      borderRadius: '8px',
       '&:hover': {
         backgroundColor: tokens.colorNeutralBackground2Hover,
       }
@@ -28,7 +29,7 @@ const useStyles = makeStyles({
     '& .fui-AccordionHeader__button': {
       backgroundColor: 'transparent',
       transition: `background-color ${tokens.durationFaster}`,
-      borderRadius: tokens.borderRadiusMedium,
+      borderRadius: '8px',
       '&:hover': {
         backgroundColor: tokens.colorNeutralBackground3Hover,
       }
@@ -56,7 +57,7 @@ const useStyles = makeStyles({
     display: 'flex',
     alignItems: 'center',
     padding: `${tokens.spacingVerticalS} 0`,
-    borderRadius: tokens.borderRadiusMedium,
+    borderRadius: '8px',
     justifyContent: 'space-between',
     height: '32px',
     boxSizing: 'border-box',
@@ -73,9 +74,8 @@ const useStyles = makeStyles({
     justifyContent: 'center',
     width: '24px',
     height: '24px',
-    borderRadius: '4px',
-    backgroundColor: tokens.colorNeutralBackground3,
-    color: tokens.colorNeutralForeground2,
+    borderRadius: '8px',
+    overflow: 'hidden',
     '& svg': {
       width: '16px',
       height: '16px',
@@ -89,7 +89,7 @@ const useStyles = makeStyles({
   },
   actionItem: {
     backgroundColor: 'transparent',
-    borderRadius: tokens.borderRadiusMedium,
+    borderRadius: '8px',
     padding: `${tokens.spacingVerticalS} 0`,
     height: '32px',
     boxSizing: 'border-box',
@@ -208,8 +208,8 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
                 <AccordionHeader size="small">
                   <div className={styles.groupHeaderLeft}>
                     {group.icon && (
-                      <span className={styles.groupIcon}>
-                        <DocumentRegular />
+                      <span className={`${styles.groupIcon} ${getIconBackgroundClass(group.iconColor)} ${getIconColorClass(group.iconColor)}`}>
+                        {getIconByName(group.icon, group.id)}
                       </span>
                     )}
                     <Text 

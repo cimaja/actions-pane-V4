@@ -4,7 +4,7 @@ import { ActionGroup, ActionItemType } from '../../../models/types';
 export const module: ActionGroup = {
   id: 'message-boxes',
   title: 'Message boxes',
-  icon: 'channel', // Using channel icon for message boxes
+  icon: 'channel24Regular', // Using channel icon for message boxes
   iconColor: 'orange',
   tags: ['Interaction'], // Category tag for this module
   items: [], // This will be populated with references to the actions

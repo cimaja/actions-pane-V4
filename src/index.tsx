@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './styles/index.css';
+import './styles/iconStyles.css';
 import App from './App';
 import { FluentProvider, teamsLightTheme } from '@fluentui/react-components';
 

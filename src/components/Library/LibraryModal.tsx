@@ -21,6 +21,8 @@ import {
   Dismiss24Regular, 
   Search24Regular, 
   CheckmarkCircle24Filled,
+  Beaker24Regular,
+  DocumentData24Regular,
   ArrowDownload24Regular,
   Globe24Regular,
   Folder24Regular,
@@ -60,11 +62,18 @@ import { dataService } from '../../data/dataService';
 import { LibraryItemType, LibraryCategoryType } from '../../models/types';
 import { MailShield24Regular } from './MailShieldIcon';
 import { ArrowCircleDownUp24Regular } from './ArrowCircleDownUpIcon';
+import { AIBuilder24Regular } from './AIBuilderIcon';
+import { AWS24Regular } from './AWSIcon';
+import { Azure24Regular } from './AzureIcon';
+import { CyberArk24Regular } from './CyberArkIcon';
 import { CustomGlobe24Regular } from './GlobeIcon';
 import { ActiveDirectory24Regular } from './ActiveDirectoryIcon';
 import { ListBarTree24Regular } from './ListBarTreeIcon';
-
-
+import { GoogleCognitive24Regular } from './GoogleCognitiveIcon';
+import { IBMCognitive24Regular } from './IBMCognitiveIcon';
+import { MicrosoftCognitive24Regular } from './MicrosoftCognitiveIcon';
+import { getIconByName } from '../../utils/iconUtils';
+import { getIconColorClass, getIconBackgroundClass } from '../../utils/iconColorUtils';
 
 // Extended interface for module items with additional properties
 interface ModuleItemType extends LibraryItemType {
@@ -76,10 +85,17 @@ interface ModuleItemType extends LibraryItemType {
 const useStyles = makeStyles({
   dialogSurface: {
     width: '80vw',
-    maxWidth: '1000px',
     height: '80vh',
+    maxWidth: '1200px',
     maxHeight: '800px',
     padding: 0,
+    '@media (max-width: 768px)': {
+      width: '90vw',
+    },
+    '@media (max-width: 480px)': {
+      width: '95vw',
+      height: '90vh',
+    },
   },
   header: {
     display: 'flex',
@@ -111,6 +127,10 @@ const useStyles = makeStyles({
     flexShrink: 0,
     height: '100%',
     overflow: 'auto',
+    transition: 'width 0.2s ease',
+    '@media (max-width: 900px)': {
+      width: '48px',
+    },
   },
   navItem: {
     padding: tokens.spacingVerticalS,
@@ -128,6 +148,18 @@ const useStyles = makeStyles({
     paddingLeft: tokens.spacingHorizontalL,
     paddingRight: tokens.spacingHorizontalL,
     height: '44px',
+    transition: 'all 0.2s ease',
+    '@media (max-width: 900px)': {
+      justifyContent: 'center',
+      paddingLeft: '12px',
+      paddingRight: '12px',
+    },
+  },
+  navItemText: {
+    transition: 'opacity 0.2s ease',
+    '@media (max-width: 900px)': {
+      display: 'none',
+    },
   },
   navIcon: {
     display: 'flex',
@@ -203,52 +235,8 @@ const useStyles = makeStyles({
     width: '28px',
     height: '28px',
     borderRadius: '8px',
+    overflow: 'hidden',
     flexShrink: 0,
-  },
-  // Logic category (red)
-  iconAmber: {
-    backgroundColor: '#FEF3C7',
-    color: '#CA5010',
-  },
-  // Integration category (blue)
-  iconBlue: {
-    backgroundColor: '#E0E7FF',
-    color: '#4F6BED',
-  },
-  // Advanced category (green)
-  iconGreen: {
-    backgroundColor: '#D1FAE5',
-    color: '#059669',
-  },
-  // Custom actions (purple)
-  iconPurple: {
-    backgroundColor: '#F3E8FF',
-    color: '#881798',
-  },
-  // Logic category (red)
-  iconRed: {
-    backgroundColor: '#FFE4E6',
-    color: '#E11D48',
-  },
-  // Interaction category (orange)
-  iconOrange: {
-    backgroundColor: '#FFEDD5',
-    color: '#EA580C',
-  },
-  // System category (gray)
-  iconGray: {
-    backgroundColor: '#F3F4F6',
-    color: '#605E5C',
-  },
-  // Connector (light blue)
-  iconLightBlue: {
-    backgroundColor: '#E5F1FB',
-    color: '#0078D4',
-  },
-  // Scripting category (teal)
-  iconTeal: {
-    backgroundColor: '#E6FFFA',
-    color: '#00A381',
   },
   cardContent: {
     display: 'flex',
@@ -340,7 +328,7 @@ interface LibraryModalProps {
 
 export const LibraryModal = ({ open, onOpenChange }: LibraryModalProps) => {
   const styles = useStyles();
-  const [activeTab, setActiveTab] = useState<LibraryCategoryType>('Connectors');
+  const [activeTab, setActiveTab] = useState<LibraryCategoryType>('Built-in');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortType, setSortType] = useState<'name' | 'category'>('category');
 
@@ -407,156 +395,7 @@ export const LibraryModal = ({ open, onOpenChange }: LibraryModalProps) => {
     setSortType(type);
   };
 
-  // Helper function to get an icon based on the icon name
-  const getModuleIcon = (iconName?: string) => {
-    if (!iconName) return <Cube24Regular />;
-    
-    // Handle the new icon format (e.g., folderZip20Regular)
-    if (iconName.includes('20Regular') || iconName.includes('24Regular') || iconName.includes('48Regular')) {
-      // For specific icon names, handle them directly
-      if (iconName === 'shapes20Regular') {
-        return <Shapes24Regular />;
-      } else if (iconName === 'book20Regular') {
-        return <Book24Regular />;
-      }
-      
-      // For other icons, extract the base name without size and style
-      const baseName = iconName.replace(/\d+Regular$/, '');
-      
-      switch (baseName.toLowerCase()) {
-        case 'folderzip':
-          return <FolderZip24Regular />;
-        case 'document':
-          return <Document24Regular />;
-        case 'laptop':
-          return <Laptop24Regular />;
-        case 'plugconnected':
-          return <PlugConnected24Regular />;
-        case 'puzzlepiece':
-          return <PuzzlePiece24Regular />;
-        case 'braces':
-          return <Braces24Regular />;
-        case 'bracesvariable':
-          return <BracesVariable24Regular />;
-        case 'window':
-          return <Window24Regular />;
-        case 'windowconsole':
-          return <WindowConsoleRegular style={{ fontSize: '24px' }} />;
-        case 'desktoptower':
-          return <Desktop24Regular />;
-        case 'windowsettings':
-          return <Settings24Regular />;
-        case 'scantext':
-          return <ScanText24Regular />;
-        case 'textfield':
-          return <TextDescription24Regular />;
-        case 'database':
-          return <Database24Regular />;
-        case 'mail':
-          return <Mail24Regular />;
-        case 'mailunread':
-          return <Mail24Regular />;
-        case 'mailinbox':
-          return <MailInbox24Regular />;
-        case 'mailshield':
-          // Using our custom MailShield icon implementation
-          return <MailShield24Regular />;
-        case 'arrowcircledownup':
-          return <ArrowCircleDownUp24Regular />;
-        case 'customglobe':
-          return <CustomGlobe24Regular />;
-        case 'customactivedirectory':
-          return <ActiveDirectory24Regular />;
-        case 'listbartree':
-          return <ListBarTree24Regular />;
-        case 'code':
-          return <Code24Regular />;
-        case 'lockclosed':
-          return <LockClosed24Regular />;
-        case 'listorder':
-          return <Channel24Regular />;
-        case 'peopleteam':
-          return <Organization24Regular />;
-        // Add more cases for other icons in the new format as needed
-        default:
-          return <Cube24Regular />;
-      }
-    }
-    
-    // Handle the old icon format
-    switch (iconName.toLowerCase()) {
-      case 'globe':
-        return <Globe24Regular />;
-      case 'folder':
-        return <Folder24Regular />;
-      case 'comment':
-        return <Comment24Regular />;
-      case 'clock':
-        return <Calendar24Regular />;
-      case 'calendar':
-        return <Calendar24Regular />;
-      case 'code':
-        return <Code24Regular />;
-      case 'windowconsole':
-        return <WindowConsoleRegular style={{ fontSize: '24px' }} />; // Using dedicated console icon
-
-      case 'document':
-        return <Document24Regular />;
-      case 'cube':
-        return <Cube24Regular />;
-      case 'organization':
-        return <Organization24Regular />;
-      case 'timer':
-        return <Timer24Regular />;
-      case 'clipboard':
-        return <Clipboard24Regular />;
-      case 'channel':
-        return <Channel24Regular />;
-      case 'arrow-repeat-all':
-        return <ArrowRepeatAll24Regular />;
-      case 'keyboard':
-        return <Keyboard24Regular />;
-      case 'pdf':
-        return <DocumentPdf24Regular />;
-      case 'database':
-        return <Database24Regular />;
-      case 'server':
-        return <Database24Regular />;
-      case 'folder-zip':
-        return <FolderZip24Regular />;
-      default:
-        return <Cube24Regular />;
-    }
-  };
-
-  // Helper function to get the appropriate icon color class
-  const getIconColorClass = (iconColor?: string) => {
-    if (!iconColor) return styles.iconBlue;
-    
-    switch (iconColor.toLowerCase()) {
-      case 'amber':
-        return styles.iconAmber;
-      case 'blue':
-        return styles.iconBlue;
-      case 'green':
-        return styles.iconGreen;
-      case 'purple':
-        return styles.iconPurple;
-      case 'red':
-        return styles.iconRed;
-      case 'orange':
-        return styles.iconOrange;
-      case 'grey':
-      case 'gray':
-        return styles.iconGray;
-      case 'lightblue':
-        return styles.iconLightBlue;
-      case 'teal':
-        return styles.iconTeal; // Using the dedicated teal style
-      default:
-        return styles.iconBlue;
-    }
-  };
+  // Using shared icon color utility
   
   // Helper function to get a category name from tags
   const getCategoryFromTags = (tags: string[]) => {
@@ -580,7 +419,6 @@ export const LibraryModal = ({ open, onOpenChange }: LibraryModalProps) => {
       case 'Custom Actions':
         return <PuzzlePiece24Regular />;
       case 'UI Collections':
-        // Using the exact icon format as requested: shapes20Regular
         return <Shapes24Regular />;
       case 'Templates':
         return <Book24Regular />;
@@ -597,7 +435,6 @@ export const LibraryModal = ({ open, onOpenChange }: LibraryModalProps) => {
     // This would be implemented to actually install the connector
     console.log(`Installing item with ID: ${itemId}`);
     // In a real implementation, this would call an API to install the item
-    // For now, we'll just log the action
   };
 
   return (
@@ -624,7 +461,7 @@ export const LibraryModal = ({ open, onOpenChange }: LibraryModalProps) => {
                 onClick={() => setActiveTab(category)}
               >
                 <span className={styles.navIcon}>{getCategoryIcon(category)}</span>
-                <Text>{category}</Text>
+                <Text className={styles.navItemText}>{category}</Text>
               </div>
             ))}
           </div>
@@ -679,9 +516,9 @@ export const LibraryModal = ({ open, onOpenChange }: LibraryModalProps) => {
                           className={styles.card}
                         >
                           <div 
-                            className={`${styles.cardIcon} ${getIconColorClass((item as ModuleItemType).iconColor)}`}
+                            className={`${styles.cardIcon} ${getIconBackgroundClass((item as ModuleItemType).iconColor)} ${getIconColorClass((item as ModuleItemType).iconColor)}`}
                           >
-                            {getModuleIcon((item as ModuleItemType).icon)}
+                            {getIconByName(item.icon, item.id)}
                           </div>
                           <div className={styles.cardContent}>
                             <Text weight="regular">{item.title}</Text>
@@ -728,9 +565,9 @@ export const LibraryModal = ({ open, onOpenChange }: LibraryModalProps) => {
                         className={styles.card}
                       >
                         <div 
-                          className={`${styles.cardIcon} ${getIconColorClass((item as ModuleItemType).iconColor)}`}
+                          className={`${styles.cardIcon} ${getIconBackgroundClass((item as ModuleItemType).iconColor)} ${getIconColorClass((item as ModuleItemType).iconColor)}`}
                         >
-                          {getModuleIcon((item as ModuleItemType).icon)}
+                          {getIconByName(item.icon, item.id)}
                         </div>
                         <div className={styles.cardContent}>
                           <Text weight="regular">{item.title}</Text>

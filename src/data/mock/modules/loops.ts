@@ -4,7 +4,7 @@ import { ActionGroup, ActionItemType } from '../../../models/types';
 export const module: ActionGroup = {
   id: 'loops',
   title: 'Loops',
-  icon: 'arrow-repeat-all', // Using code icon since ArrowRepeatAll isn't in our icon set
+  icon: 'arrowRepeatAll24Regular', // Using code icon since ArrowRepeatAll isn't in our icon set
   iconColor: 'red',
   tags: ['Logic'], // Category tag for this module
   items: [], // This will be populated with references to the actions

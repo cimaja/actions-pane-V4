@@ -4,7 +4,7 @@ import { ActionGroup, ActionItemType } from '../../../models/types';
 export const module: ActionGroup = {
   id: 'conditionals',
   title: 'Conditionals',
-  icon: 'organization', // Using code icon since BranchFork isn't in our icon set
+  icon: 'organization24Regular',
   iconColor: 'red',
   tags: ['Logic'], // Category tag for this module
   items: [], // This will be populated with references to the actions

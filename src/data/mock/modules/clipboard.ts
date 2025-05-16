@@ -4,7 +4,7 @@ import { ActionGroup, ActionItemType } from '../../../models/types';
 export const module: ActionGroup = {
   id: 'clipboard',
   title: 'Clipboard',
-  icon: 'clipboard', // Using cube icon since Paste isn't in our icon set
+  icon: 'clipboard24Regular', // Using cube icon since Paste isn't in our icon set
   iconColor: 'orange',
   tags: ['Interaction'], // Category tag for this module
   items: [], // This will be populated with references to the actions

@@ -4,7 +4,7 @@ import { ActionGroup, ActionItemType } from '../../../models/types';
 export const module: ActionGroup = {
   id: 'exchange-server',
   title: 'Exchange server',
-  icon: 'mailShield20Regular',
+  icon: 'exchange24Regular',
   iconColor: 'blue',
   tags: ['Integration'], // Category tag for this module
   items: [], // This will be populated with references to the actions

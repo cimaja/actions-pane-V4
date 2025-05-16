@@ -4,7 +4,7 @@ import { ActionGroup, ActionItemType } from '../../../models/types';
 export const module: ActionGroup = {
   id: 'flow-control',
   title: 'Flow control',
-  icon: 'timer', // Using code icon since Flow isn't in our icon set
+  icon: 'timer24Regular', // Using code icon since Flow isn't in our icon set
   iconColor: 'red',
   tags: ['Logic'], // Category tag for this module
   items: [], // This will be populated with references to the actions
