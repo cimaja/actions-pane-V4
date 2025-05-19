@@ -3,7 +3,7 @@
   height: 100vh; /* Use viewport height to ensure full height */
   width: 100%;
   overflow: hidden;
-  background-color: #f5f5f5;
+  background-color: #ffffff;
   position: absolute; /* Position absolute to ensure it covers the entire viewport */
   top: 0;
   left: 0;

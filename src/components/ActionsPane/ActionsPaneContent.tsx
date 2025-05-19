@@ -15,6 +15,7 @@ import { ActionItem } from './ActionItem';
 import { TabType, ActionGroup } from '../../models/types';
 import { SortOrder } from './ActionsPaneHeader';
 import { dataService } from '../../data/dataService';
+import { openLibraryWithCategory } from './LibraryEntryPoint';
 
 const useStyles = makeStyles({
   expandableGroup: {
@@ -45,12 +46,17 @@ const useStyles = makeStyles({
     height: '100%',
     overflow: 'auto',
     padding: `${tokens.spacingVerticalM} 0`,
+    '& > *': {
+      backgroundColor: 'inherit',
+    }
   },
+  
   groupContainer: {
     display: 'flex',
     flexDirection: 'column',
     gap: tokens.spacingVerticalXS,
   },
+
   groupContent: {
     display: 'flex',
     flexDirection: 'column',
@@ -128,9 +134,12 @@ const useStyles = makeStyles({
     flexDirection: 'column',
     gap: tokens.spacingVerticalXS,
     margin: 0,
-    '& > *': {
-      margin: 0,
-    },
+  },
+  accordionPanel: {
+    backgroundColor: tokens.colorNeutralBackground1,
+    borderRadius: '8px',
+    padding: tokens.spacingHorizontalM,
+    marginTop: tokens.spacingVerticalXS,
   },
   accordionHeader: {
     '& button.fui-AccordionHeader__button': {
@@ -157,6 +166,7 @@ const useStyles = makeStyles({
     marginBottom: tokens.spacingVerticalXS,
     display: 'flex',
     alignItems: 'center',
+    justifyContent: 'space-between',
     height: '32px',
   },
   categoryTitle: {
@@ -164,18 +174,29 @@ const useStyles = makeStyles({
     fontWeight: tokens.fontWeightSemibold,
     color: tokens.colorNeutralForeground1,
   },
+  seeAllLink: {
+    fontSize: tokens.fontSizeBase200,
+    color: tokens.colorBrandForeground1,
+    textDecoration: 'none',
+    cursor: 'pointer',
+    '&:hover': {
+      textDecoration: 'underline',
+    },
+  },
 }); 
 
 interface ActionsPaneContentProps {
   activeTab: string;
   searchQuery: string;
   sortOrder: SortOrder;
+  setActiveTab: (tab: string) => void;
 }
 
 export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
   activeTab,
   searchQuery,
   sortOrder,
+  setActiveTab,
 }) => {
   const styles = useStyles();
   // Initialize all groups as collapsed by default
@@ -285,7 +306,7 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
                 </Text>
               </div>
             </AccordionHeader>
-            <AccordionPanel>
+            <AccordionPanel className={styles.accordionPanel}>
               <div className={styles.groupItemsContainer}>
                 {/* Render items */}
                 {group.items.map(item => (
@@ -366,6 +387,29 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
             <div className={styles.categoryHeader}>
               <Text className={styles.categoryTitle}>
                 {category === 'connector' ? 'Connectors' : category}
+              </Text>
+              <Text 
+                className={styles.seeAllLink} 
+                onClick={() => {
+                  // Map the category to a valid LibraryCategoryType
+                  let libraryCategory;
+                  console.log('See all clicked for category:', category);
+                  
+                  if (category === 'connector' || category === 'Connectors') {
+                    libraryCategory = 'Connectors';
+                  } else if (category === 'Data' || category === 'Integration') {
+                    libraryCategory = 'Built-in';
+                  } else {
+                    libraryCategory = 'Built-in';
+                  }
+                  
+                  console.log('Mapped to library category:', libraryCategory);
+                  
+                  // Open library with the selected category
+                  openLibraryWithCategory(libraryCategory);
+                }}
+              >
+                See all
               </Text>
             </div>
             {groups.map(group => renderGroup(group))}

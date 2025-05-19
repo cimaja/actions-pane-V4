@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   makeStyles,
   Dialog,
@@ -16,7 +16,6 @@ import {
   Option
 } from '@fluentui/react-components';
 
-import React from 'react';
 import { 
   Dismiss24Regular, 
   Search24Regular, 
@@ -322,15 +321,23 @@ const useStyles = makeStyles({
 interface LibraryModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  initialCategory?: string;
 }
 
-
-
-export const LibraryModal = ({ open, onOpenChange }: LibraryModalProps) => {
+export const LibraryModal = ({ open, onOpenChange, initialCategory }: LibraryModalProps) => {
   const styles = useStyles();
-  const [activeTab, setActiveTab] = useState<LibraryCategoryType>('Built-in');
+  const [activeTab, setActiveTab] = useState<LibraryCategoryType>(initialCategory as LibraryCategoryType || 'Built-in');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortType, setSortType] = useState<'name' | 'category'>('category');
+
+  // Update activeTab when initialCategory changes
+  useEffect(() => {
+    console.log('LibraryModal initialCategory:', initialCategory);
+    if (initialCategory) {
+      console.log('Setting activeTab to:', initialCategory);
+      setActiveTab(initialCategory as LibraryCategoryType);
+    }
+  }, [initialCategory]);
 
   // Get library items based on the selected category and search query
   const libraryItems = dataService.getLibraryItemsByCategory(activeTab);

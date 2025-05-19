@@ -33,7 +33,7 @@ const useStyles = makeStyles({
     display: 'flex',
     flexDirection: 'column',
     height: '100vh', /* Use viewport height to ensure full height */
-    backgroundColor: tokens.colorNeutralBackground1,
+    backgroundColor: tokens.colorNeutralBackground2, /* Light gray background */
     boxShadow: tokens.shadow8,
     position: 'relative',
     overflow: 'hidden', /* Prevent double scrollbars */
@@ -108,6 +108,7 @@ const useStyles = makeStyles({
     display: 'flex',
     flexDirection: 'column',
     minHeight: 0, /* Critical for Firefox to respect flex-grow within a container */
+    height: '100%', // Ensure it takes full height
   },
   footer: {
     padding: '8px',
@@ -236,6 +237,7 @@ export const ActionsPane: React.FC = () => {
           activeTab={activeTab}
           searchQuery={searchQuery}
           sortOrder={sortOrder}
+          setActiveTab={setActiveTab}
         />
       </div>
       <div className={styles.footer}>
