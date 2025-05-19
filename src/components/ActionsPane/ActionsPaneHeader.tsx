@@ -16,6 +16,7 @@ import { SearchBox } from '@fluentui/react-search';
 import { 
   Filter24Regular,
   Checkmark20Regular,
+  Star20Filled,
 } from '@fluentui/react-icons';
 
 const useStyles = makeStyles({
@@ -156,6 +157,7 @@ interface ActionsPaneHeaderProps {
   onSearchChange: (query: string) => void;
   sortOrder: SortOrder;
   onSortOrderChange: (order: SortOrder) => void;
+  isCompact?: boolean;
 }
 
 interface FilterOption {
@@ -171,6 +173,7 @@ export const ActionsPaneHeader: React.FC<ActionsPaneHeaderProps> = ({
   onSearchChange,
   sortOrder,
   onSortOrderChange,
+  isCompact = false,
 }) => {
   const styles = useStyles();
   const [filterMenuOpen, setFilterMenuOpen] = useState<boolean>(false);
@@ -246,16 +249,30 @@ export const ActionsPaneHeader: React.FC<ActionsPaneHeaderProps> = ({
           >
             Connectors
           </Badge>
-          <Badge 
-            className={styles.badge}
-            appearance={activeTab === "Favorites" ? "tint" : "outline"}
-            color={activeTab === "Favorites" ? "brand" : "informative"}
-            shape="circular"
-            size="large"
-            onClick={() => onTabChange("Favorites")}
-          >
-            Favorites
-          </Badge>
+          {isCompact ? (
+            <Tooltip content="Favorites" relationship="label">
+              <Badge 
+                className={styles.badge}
+                appearance={activeTab === "Favorites" ? "tint" : "outline"}
+                color={activeTab === "Favorites" ? "brand" : "informative"}
+                shape="circular"
+                size="large"
+                onClick={() => onTabChange("Favorites")}
+                icon={<Star20Filled fontSize={12} />}
+              />
+            </Tooltip>
+          ) : (
+            <Badge 
+              className={styles.badge}
+              appearance={activeTab === "Favorites" ? "tint" : "outline"}
+              color={activeTab === "Favorites" ? "brand" : "informative"}
+              shape="circular"
+              size="large"
+              onClick={() => onTabChange("Favorites")}
+            >
+              Favorites
+            </Badge>
+          )}
         </div>
         
         <Menu open={filterMenuOpen} onOpenChange={(e, data) => setFilterMenuOpen(data.open)}>

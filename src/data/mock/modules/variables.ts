@@ -298,13 +298,9 @@ module.subGroups = [
   operationsSubgroup
 ];
 
-// Combine all actions for the main module's items
-module.items = [
-  ...dataTableActions,
-  ...numberActions,
-  ...listActions,
-  ...operationsActions
-];
+// Don't add actions to the main module to avoid duplicates
+// Only show actions in their respective subgroups
+module.items = [];
 
 // Helper function to get all actions for this module
 export const getAllActions = () => module.items;

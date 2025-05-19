@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   makeStyles,
   Text,
@@ -7,11 +7,12 @@ import {
   AccordionItem,
   AccordionPanel,
   tokens,
+  Divider,
 } from '@fluentui/react-components';
 import { getIconByName } from '../../utils/iconUtils';
 import { getIconColorClass, getIconBackgroundClass } from '../../utils/iconColorUtils';
 import { ActionItem } from './ActionItem';
-import { TabType } from '../../models/types';
+import { TabType, ActionGroup } from '../../models/types';
 import { SortOrder } from './ActionsPaneHeader';
 import { dataService } from '../../data/dataService';
 
@@ -150,6 +151,19 @@ const useStyles = makeStyles({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  categoryHeader: {
+    padding: `${tokens.spacingVerticalS} ${tokens.spacingHorizontalS}`,
+    marginTop: tokens.spacingVerticalM,
+    marginBottom: tokens.spacingVerticalXS,
+    display: 'flex',
+    alignItems: 'center',
+    height: '32px',
+  },
+  categoryTitle: {
+    fontSize: tokens.fontSizeBase300,
+    fontWeight: tokens.fontWeightSemibold,
+    color: tokens.colorNeutralForeground1,
+  },
 }); 
 
 interface ActionsPaneContentProps {
@@ -170,7 +184,7 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
   const [favoriteItems, setFavoriteItems] = useState<Record<string, boolean>>({});
 
   // Get filtered groups from the data service and apply sorting
-  const filteredGroups = (() => {
+  const filteredGroups = useMemo(() => {
     const groups = dataService.getActionsPaneContent(
       activeTab as TabType,
       searchQuery,
@@ -196,7 +210,7 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
     
     // Default sorting (name-asc or recent)
     return groups;
-  })();
+  }, [activeTab, searchQuery, favoriteItems, sortOrder]);
 
   // Toggle group expansion
   const toggleGroup = (groupId: string) => {
@@ -206,7 +220,132 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
     }));
   };
 
-  if (filteredGroups.length === 0) {
+  // Filter to only show installed modules
+  const installedGroups = useMemo(() => {
+    return filteredGroups.filter(group => group.isInstalled !== false);
+  }, [filteredGroups]);
+
+  // Group items by category when sorting by category
+  const groupedByCategory = useMemo(() => {
+    // Only apply category grouping for All and Built-in tabs with category sorting
+    if (sortOrder !== 'category' || !['All', 'Built-in'].includes(activeTab)) {
+      return null;
+    }
+    
+    // Safety check - if we don't have any groups, don't try to categorize
+    if (!installedGroups || installedGroups.length === 0) {
+      return null;
+    }
+
+    const categoryGroups: Record<string, ActionGroup[]> = {};
+    
+    installedGroups.forEach(group => {
+      const category = group.tags?.[0] || 'Other';
+      if (!categoryGroups[category]) {
+        categoryGroups[category] = [];
+      }
+      categoryGroups[category].push(group);
+    });
+
+    // Convert to array and sort categories alphabetically
+    return Object.entries(categoryGroups)
+      .sort(([categoryA], [categoryB]) => categoryA.localeCompare(categoryB))
+      .map(([category, groups]) => ({
+        category,
+        groups
+      }));
+  }, [installedGroups, sortOrder, activeTab]);
+
+  // Render a group with its items and subgroups
+  const renderGroup = (group: ActionGroup) => {
+    const isExpanded = expandedGroups[group.id] === true;
+
+    return (
+      <div key={group.id} className={styles.groupContainer}>
+        <Accordion
+          collapsible
+          openItems={isExpanded ? [group.id] : []}
+          onToggle={() => toggleGroup(group.id)}
+        >
+          <AccordionItem value={group.id} className={styles.expandableGroup}>
+            <AccordionHeader size="small">
+              <div className={styles.groupHeaderLeft}>
+                {group.icon && (
+                  <span className={`${styles.groupIcon} ${getIconBackgroundClass(group.iconColor)} ${getIconColorClass(group.iconColor)}`}>
+                    {getIconByName(group.icon, group.id)}
+                  </span>
+                )}
+                <Text 
+                  className={styles.groupTitle}
+                  truncate 
+                  block
+                  weight="semibold"
+                >
+                  {group.title}
+                </Text>
+              </div>
+            </AccordionHeader>
+            <AccordionPanel>
+              <div className={styles.groupItemsContainer}>
+                {/* Render items */}
+                {group.items.map(item => (
+                  <div key={item.id} className={styles.actionItem}>
+                    <ActionItem 
+                      item={{...item, isFavorite: !!favoriteItems[item.id]}}
+                      onFavoriteChange={(itemId, isFavorite) => {
+                        setFavoriteItems(prev => ({
+                          ...prev,
+                          [itemId]: isFavorite
+                        }));
+                      }} 
+                    />
+                  </div>
+                ))}
+              </div>
+              
+              {/* Render subgroups if they exist */}
+              {group.subGroups && group.subGroups.length > 0 && (
+                <Accordion collapsible multiple defaultOpenItems={[]}>
+                  {group.subGroups.map(subGroup => (
+                    <AccordionItem key={subGroup.id} value={subGroup.id} className={styles.nestedGroup}>
+                      <AccordionHeader size="small">
+                        <div className={styles.groupHeaderLeft}>
+                          <Text className={styles.groupTitle} truncate block>{subGroup.title}</Text>
+                          <Text size={200} weight="regular" style={{marginLeft: 'auto'}}>
+                            {subGroup.items.length} items
+                          </Text>
+                        </div>
+                      </AccordionHeader>
+                      <AccordionPanel>
+                        <div className={styles.groupItemsContainer}>
+                          {subGroup.items.map(item => (
+                            <div key={item.id} className={styles.actionItem}>
+                              <ActionItem 
+                                item={{...item, isFavorite: !!favoriteItems[item.id]}}
+                                onFavoriteChange={(itemId, isFavorite) => {
+                                  setFavoriteItems(prev => ({
+                                    ...prev,
+                                    [itemId]: isFavorite
+                                  }));
+                                }} 
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </AccordionPanel>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              )}
+            </AccordionPanel>
+          </AccordionItem>
+        </Accordion>
+      </div>
+    );
+  };
+
+  // Render empty state if no groups found
+  if (installedGroups.length === 0) {
     return (
       <div className={styles.emptyState}>
         {activeTab === 'Favorites' ? (
@@ -220,92 +359,22 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
 
   return (
     <div className={styles.container}>
-      {filteredGroups.map(group => {
-        const isExpanded = expandedGroups[group.id] === true;
-
-        return (
-          <div key={group.id} className={styles.groupContainer}>
-            <Accordion
-              collapsible
-              openItems={isExpanded ? [group.id] : []}
-              onToggle={() => toggleGroup(group.id)}
-            >
-              <AccordionItem value={group.id} className={styles.expandableGroup}>
-                <AccordionHeader size="small">
-                  <div className={styles.groupHeaderLeft}>
-                    {group.icon && (
-                      <span className={`${styles.groupIcon} ${getIconBackgroundClass(group.iconColor)} ${getIconColorClass(group.iconColor)}`}>
-                        {getIconByName(group.icon, group.id)}
-                      </span>
-                    )}
-                    <Text 
-                      className={styles.groupTitle}
-                      truncate 
-                      block
-                      weight="semibold"
-                    >
-                      {group.title}
-                    </Text>
-                  </div>
-                </AccordionHeader>
-                <AccordionPanel>
-                  <div className={styles.groupItemsContainer}>
-                    {/* Render items */}
-                    {group.items.map(item => (
-                      <div key={item.id} className={styles.actionItem}>
-                        <ActionItem 
-                          item={{...item, isFavorite: !!favoriteItems[item.id]}}
-                          onFavoriteChange={(itemId, isFavorite) => {
-                            setFavoriteItems(prev => ({
-                              ...prev,
-                              [itemId]: isFavorite
-                            }));
-                          }} 
-                        />
-                      </div>
-                    ))}
-                  </div>
-                  
-                  {/* Render subgroups if they exist */}
-                  {group.subGroups && group.subGroups.length > 0 && (
-                    <Accordion collapsible multiple defaultOpenItems={[]}>
-                      {group.subGroups.map(subGroup => (
-                        <AccordionItem key={subGroup.id} value={subGroup.id} className={styles.nestedGroup}>
-                          <AccordionHeader size="small">
-                            <div className={styles.groupHeaderLeft}>
-                              <Text className={styles.groupTitle} truncate block>{subGroup.title}</Text>
-                              <Text size={200} weight="regular" style={{marginLeft: 'auto'}}>
-                                {subGroup.items.length} items
-                              </Text>
-                            </div>
-                          </AccordionHeader>
-                          <AccordionPanel>
-                            <div className={styles.groupItemsContainer}>
-                              {subGroup.items.map(item => (
-                                <div key={item.id} className={styles.actionItem}>
-                                  <ActionItem 
-                                    item={{...item, isFavorite: !!favoriteItems[item.id]}}
-                                    onFavoriteChange={(itemId, isFavorite) => {
-                                      setFavoriteItems(prev => ({
-                                        ...prev,
-                                        [itemId]: isFavorite
-                                      }));
-                                    }} 
-                                  />
-                                </div>
-                              ))}
-                            </div>
-                          </AccordionPanel>
-                        </AccordionItem>
-                      ))}
-                    </Accordion>
-                  )}
-                </AccordionPanel>
-              </AccordionItem>
-            </Accordion>
-          </div>
-        );
-      })}
+      {groupedByCategory ? (
+        // Render groups organized by category with headers
+        groupedByCategory.map(({ category, groups }) => (
+          <React.Fragment key={category}>
+            <div className={styles.categoryHeader}>
+              <Text className={styles.categoryTitle}>
+                {category === 'connector' ? 'Connectors' : category}
+              </Text>
+            </div>
+            {groups.map(group => renderGroup(group))}
+          </React.Fragment>
+        ))
+      ) : (
+        // Render groups without category headers
+        installedGroups.map(group => renderGroup(group))
+      )}
     </div>
   );
 };

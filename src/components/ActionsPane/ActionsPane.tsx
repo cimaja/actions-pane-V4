@@ -10,6 +10,7 @@ import { LibraryEntryPoint } from './LibraryEntryPoint';
 const MIN_WIDTH = 320;
 const MAX_WIDTH = 600;
 const DEFAULT_WIDTH = 360;
+const COMPACT_THRESHOLD = 330; // Threshold for compact mode
 
 // Load saved width from localStorage if available
 const getSavedWidth = (): number => {
@@ -124,6 +125,7 @@ export const ActionsPane: React.FC = () => {
   const [isResizing, setIsResizing] = useState<boolean>(false);
   const [isAtMinWidth, setIsAtMinWidth] = useState<boolean>(width <= MIN_WIDTH);
   const [isAtMaxWidth, setIsAtMaxWidth] = useState<boolean>(width >= MAX_WIDTH);
+  const [isCompactMode, setIsCompactMode] = useState<boolean>(width <= COMPACT_THRESHOLD);
   const containerRef = useRef<HTMLDivElement>(null);
   const startXRef = useRef<number>(0);
   const startWidthRef = useRef<number>(0);
@@ -155,6 +157,7 @@ export const ActionsPane: React.FC = () => {
     setWidth(DEFAULT_WIDTH);
     setIsAtMinWidth(DEFAULT_WIDTH <= MIN_WIDTH);
     setIsAtMaxWidth(DEFAULT_WIDTH >= MAX_WIDTH);
+    setIsCompactMode(DEFAULT_WIDTH <= COMPACT_THRESHOLD);
     
     if (containerRef.current) {
       containerRef.current.style.width = `${DEFAULT_WIDTH}px`;
@@ -182,6 +185,7 @@ export const ActionsPane: React.FC = () => {
     setWidth(newWidth);
     setIsAtMinWidth(newWidth <= MIN_WIDTH);
     setIsAtMaxWidth(newWidth >= MAX_WIDTH);
+    setIsCompactMode(newWidth <= COMPACT_THRESHOLD);
   }).current;
 
   // Handle resize end
@@ -223,6 +227,7 @@ export const ActionsPane: React.FC = () => {
           onSearchChange={setSearchQuery}
           sortOrder={sortOrder}
           onSortOrderChange={setSortOrder}
+          isCompact={isCompactMode}
         />
         <Divider />
       </div>
