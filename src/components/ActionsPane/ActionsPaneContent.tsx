@@ -46,9 +46,6 @@ const useStyles = makeStyles({
     height: '100%',
     overflow: 'auto',
     padding: `${tokens.spacingVerticalM} 0`,
-    '& > *': {
-      backgroundColor: 'inherit',
-    }
   },
   
   groupContainer: {
@@ -136,10 +133,8 @@ const useStyles = makeStyles({
     margin: 0,
   },
   accordionPanel: {
-    backgroundColor: tokens.colorNeutralBackground1,
-    borderRadius: '8px',
-    padding: tokens.spacingHorizontalM,
-    marginTop: tokens.spacingVerticalXS,
+    padding: tokens.spacingHorizontalS,
+    marginTop: '4px',
   },
   accordionHeader: {
     '& button.fui-AccordionHeader__button': {
@@ -161,18 +156,24 @@ const useStyles = makeStyles({
     justifyContent: 'center',
   },
   categoryHeader: {
-    padding: `${tokens.spacingVerticalS} ${tokens.spacingHorizontalS}`,
-    marginTop: tokens.spacingVerticalM,
-    marginBottom: tokens.spacingVerticalXS,
+    padding: '0 0 4px 0', /* Remove horizontal padding, keep only bottom padding */
+    marginTop: tokens.spacingVerticalS, /* Reduced from M to S */
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
     height: '32px',
   },
+  categoryContainer: {
+    backgroundColor: tokens.colorNeutralBackground1, /* White background */
+    borderRadius: '8px',
+    padding: '8px', /* 8px padding on all sides */
+    marginBottom: tokens.spacingVerticalS,
+  },
   categoryTitle: {
-    fontSize: tokens.fontSizeBase300,
+    fontSize: '14px',
     fontWeight: tokens.fontWeightSemibold,
-    color: tokens.colorNeutralForeground1,
+    color: '#242424',
+    lineHeight: '1.43',
   },
   seeAllLink: {
     fontSize: tokens.fontSizeBase200,
@@ -412,7 +413,9 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
                 See all
               </Text>
             </div>
-            {groups.map(group => renderGroup(group))}
+            <div className={styles.categoryContainer}>
+              {groups.map(group => renderGroup(group))}
+            </div>
           </React.Fragment>
         ))
       ) : (

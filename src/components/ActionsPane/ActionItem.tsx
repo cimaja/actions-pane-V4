@@ -20,6 +20,8 @@ const useStyles = makeStyles({
     minWidth: 0,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
+    padding: '4px 12px 4px 10px',
+    borderRadius: '8px',
     '&:hover': {
       backgroundColor: tokens.colorNeutralBackground1Hover,
     },
@@ -37,16 +39,18 @@ const useStyles = makeStyles({
     alignItems: 'center',
     justifyContent: 'center',
     color: tokens.colorNeutralForeground2,
+    borderRadius: '8px',
   },
   title: {
     flex: 1,
-    fontSize: tokens.fontSizeBase300,
+    fontSize: '14px',
+    lineHeight: '1.43',
     maxWidth: '100%',
     minWidth: 0,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    color: tokens.colorNeutralForeground1,
+    color: '#242424',
   },
   /* Button styles */
   favoriteButton: {
