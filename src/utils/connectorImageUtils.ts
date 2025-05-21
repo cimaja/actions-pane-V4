@@ -6,6 +6,13 @@ import microsoftTeamsImage from '../assets/connectors/Microsoft Teams.png';
 import office365OutlookImage from '../assets/connectors/Office 365 Outlook.png';
 import azureDevOpsImage from '../assets/connectors/Azure DevOps.png';
 import azureOpenAIImage from '../assets/connectors/Azure OpenAI.png';
+import adobeAcrobatSignImage from '../assets/connectors/Adobe Acrobat Sign.png';
+import onedriveBusinessImage from '../assets/connectors/OneDrive for Business.png';
+import excelOnlineImage from '../assets/connectors/Excel Online (Business).png';
+import githubImage from '../assets/connectors/GitHub.png';
+import microsoftFormsImage from '../assets/connectors/Microsoft Forms.png';
+import sharepointImage from '../assets/connectors/SharePoint.png';
+import wordOnlineImage from '../assets/connectors/Word Online (Business).png';
 import defaultConnectorImage from '../assets/connectors/Default connector.png';
 
 // Map of module IDs to their imported images
@@ -13,7 +20,15 @@ const connectorImageImports: Record<string, string> = {
   'microsoft-teams': microsoftTeamsImage,
   'exchange-server': office365OutlookImage,
   'azure-devops': azureDevOpsImage,
-  'azure-openai': azureOpenAIImage
+  'azure-openai': azureOpenAIImage,
+  'adobe-acrobat-sign': adobeAcrobatSignImage,
+  'office365-outlook': office365OutlookImage,
+  'onedrive-business': onedriveBusinessImage,
+  'excel-online': excelOnlineImage,
+  'github': githubImage,
+  'microsoft-forms': microsoftFormsImage,
+  'sharepoint': sharepointImage,
+  'word-online': wordOnlineImage
 };
 
 // Get the image for a connector module
@@ -47,6 +62,7 @@ const getImageNameForModule = (moduleId: string): string => {
     'dropbox': 'Dropbox.png',
     'box': 'Box.png',
     'adobe-sign': 'Adobe Acrobat Sign.png',
+    'adobe-acrobat-sign': 'Adobe Acrobat Sign.png',
     'adobe-pdf': 'Adobe PDF Services.png',
     'bitly': 'Bitly.png',
     'bing-maps': 'Bing Maps.png',

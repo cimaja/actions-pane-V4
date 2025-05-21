@@ -14,106 +14,100 @@ export const connector: LibraryItemType = {
 // Connector actions
 export const actions: DetailedActionItem[] = [
   {
-    id: 'excel-add-row',
+    id: 'add-key-column-to-table',
     moduleId: 'excel-online',
-    title: 'Add a row',
-    description: 'Add a row to a table in an Excel workbook',
+    title: 'Add a key column to a table',
+    description: 'Add a key column to an Excel table. The new column will be appended to the right.',
+    tags: ['excel', 'table', 'column', 'key'],
+    usage: 'Use this action to add a key column to an Excel table for identification purposes.'
+  },
+  {
+    id: 'add-row-into-table',
+    moduleId: 'excel-online',
+    title: 'Add a row into a table',
+    description: 'Add a new row into the Excel table.',
     tags: ['excel', 'table', 'row', 'add'],
-    usage: 'Use this action to add a new row to a table in an Excel workbook.',
-    examples: [
-      'Add new transaction data to a financial spreadsheet',
-      'Insert new inventory items into a tracking table'
-    ],
-    parameters: [
-      {
-        name: 'workbookId',
-        type: 'string',
-        description: 'The ID of the Excel workbook',
-        required: true
-      },
-      {
-        name: 'tableName',
-        type: 'string',
-        description: 'The name of the table',
-        required: true
-      },
-      {
-        name: 'values',
-        type: 'object',
-        description: 'The values to add to the new row',
-        required: true
-      }
-    ]
+    usage: 'Use this action to add a new row of data to an existing Excel table.'
   },
   {
-    id: 'excel-get-rows',
-    moduleId: 'excel-online',
-    title: 'Get rows',
-    description: 'Get rows from a table in an Excel workbook',
-    tags: ['excel', 'table', 'row', 'get'],
-    usage: 'Use this action to retrieve rows from a table in an Excel workbook with optional filtering.',
-    examples: [
-      'Retrieve expense records for a specific department',
-      'Get all customer records that match certain criteria'
-    ],
-    parameters: [
-      {
-        name: 'workbookId',
-        type: 'string',
-        description: 'The ID of the Excel workbook',
-        required: true
-      },
-      {
-        name: 'tableName',
-        type: 'string',
-        description: 'The name of the table',
-        required: true
-      },
-      {
-        name: 'filter',
-        type: 'string',
-        description: 'Filter expression to apply to the table rows',
-        required: false
-      }
-    ]
-  },
-  {
-    id: 'excel-create-table',
+    id: 'create-table',
     moduleId: 'excel-online',
     title: 'Create table',
-    description: 'Create a new table in an Excel workbook',
+    description: 'Create a new table in the Excel workbook.',
     tags: ['excel', 'table', 'create'],
-    usage: 'Use this action to create a new table in an Excel workbook.',
-    examples: [
-      'Create a new sales tracking table',
-      'Set up a new project management table with predefined columns'
-    ],
-    parameters: [
-      {
-        name: 'workbookId',
-        type: 'string',
-        description: 'The ID of the Excel workbook',
-        required: true
-      },
-      {
-        name: 'tableName',
-        type: 'string',
-        description: 'The name for the new table',
-        required: true
-      },
-      {
-        name: 'range',
-        type: 'string',
-        description: 'The Excel range for the table (e.g., A1:D5)',
-        required: true
-      },
-      {
-        name: 'hasHeaders',
-        type: 'boolean',
-        description: 'Whether the first row contains headers',
-        required: false
-      }
-    ]
+    usage: 'Use this action to create a new table in an Excel workbook with defined columns.'
+  },
+  {
+    id: 'create-worksheet',
+    moduleId: 'excel-online',
+    title: 'Create worksheet',
+    description: 'Create a new worksheet in the Excel workbook.',
+    tags: ['excel', 'worksheet', 'create'],
+    usage: 'Use this action to add a new worksheet to an existing Excel workbook.'
+  },
+  {
+    id: 'delete-row',
+    moduleId: 'excel-online',
+    title: 'Delete a row',
+    description: 'Delete a row using a key column.',
+    tags: ['excel', 'table', 'row', 'delete'],
+    usage: 'Use this action to remove a specific row from an Excel table using a key column for identification.'
+  },
+  {
+    id: 'get-row',
+    moduleId: 'excel-online',
+    title: 'Get a row',
+    description: 'Get a row using a key column.',
+    tags: ['excel', 'table', 'row', 'get'],
+    usage: 'Use this action to retrieve a specific row from an Excel table using a key column for identification.'
+  },
+  {
+    id: 'get-tables',
+    moduleId: 'excel-online',
+    title: 'Get tables',
+    description: 'Get a list of tables in the Excel workbook.',
+    tags: ['excel', 'tables', 'list'],
+    usage: 'Use this action to retrieve all tables defined in an Excel workbook.'
+  },
+  {
+    id: 'get-worksheets',
+    moduleId: 'excel-online',
+    title: 'Get worksheets',
+    description: 'Get a list of worksheets in the Excel workbook.',
+    tags: ['excel', 'worksheets', 'list'],
+    usage: 'Use this action to retrieve all worksheets in an Excel workbook.'
+  },
+  {
+    id: 'list-rows-present-in-table',
+    moduleId: 'excel-online',
+    title: 'List rows present in a table',
+    description: 'List rows present in a table.',
+    tags: ['excel', 'table', 'rows', 'list'],
+    usage: 'Use this action to retrieve all rows from an Excel table.'
+  },
+  {
+    id: 'run-script',
+    moduleId: 'excel-online',
+    title: 'Run script',
+    description: 'Runs an Office Script against an Excel workbook. Use this action when the script is saved in the default location.',
+    tags: ['excel', 'script', 'automation'],
+    usage: 'Use this action to execute an Office Script stored in the default location against an Excel workbook.'
+  },
+  {
+    id: 'run-script-from-sharepoint-library',
+    moduleId: 'excel-online',
+    title: 'Run script from SharePoint library',
+    description: 'Runs an Office Script against an Excel workbook. Use this action when the script is saved outside of the default location.',
+    tags: ['excel', 'script', 'sharepoint', 'automation'],
+    usage: 'Use this action to execute an Office Script stored in a SharePoint library against an Excel workbook.'
+  },
+  {
+    id: 'update-row',
+    moduleId: 'excel-online',
+    title: 'Update a row',
+    description: 'Update a row using a key column. The input value will overwrite the specified cells and columns left blank will not be updated. In order to append (instead of overwrite) a value, use the "Get a row" action to retrieve the content first.',
+    tags: ['excel', 'table', 'row', 'update'],
+    usage: 'Use this action to modify specific cells in a row of an Excel table using a key column for identification.'
   }
 ];
 
