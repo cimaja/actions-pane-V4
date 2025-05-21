@@ -38,15 +38,15 @@ const darkTheme: Theme = {
 };
 
 // Customize specific parts of the theme if needed
-lightTheme.colorBrandForeground1 = brandColors.brand80; // Active text color
-lightTheme.colorBrandForeground2 = brandColors.brand80; // Active text color
-lightTheme.colorBrandStroke1 = brandColors.brand80; // Active border color
-lightTheme.colorBrandStroke2 = brandColors.brand80; // Active border color
+lightTheme.colorBrandForeground1 = brandColors.brand80; // Primary brand text color
+lightTheme.colorBrandForeground2 = brandColors.brand60; // Secondary brand text color
+lightTheme.colorBrandStroke1 = brandColors.brand80; // Primary brand border color
+lightTheme.colorBrandStroke2 = brandColors.brand60; // Secondary brand border color
 
-darkTheme.colorBrandForeground1 = brandColors.brand80; // Active text color
-darkTheme.colorBrandForeground2 = brandColors.brand80; // Active text color
-darkTheme.colorBrandStroke1 = brandColors.brand80; // Active border color
-darkTheme.colorBrandStroke2 = brandColors.brand80; // Active border color
+darkTheme.colorBrandForeground1 = brandColors.brand80; // Primary brand text color
+darkTheme.colorBrandForeground2 = brandColors.brand60; // Secondary brand text color
+darkTheme.colorBrandStroke1 = brandColors.brand80; // Primary brand border color
+darkTheme.colorBrandStroke2 = brandColors.brand60; // Secondary brand border color
 
 interface BrandThemeProviderProps {
   children: React.ReactNode;

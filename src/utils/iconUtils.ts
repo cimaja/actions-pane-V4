@@ -133,6 +133,11 @@ const iconMap: Record<string, IconComponent> = {
   database20Regular: Database24Regular,
   database24Regular: Database24Regular,
   
+  // Clipboard
+  clipboard: ClipboardTask24Regular,
+  clipboard20Regular: ClipboardTask24Regular,
+  clipboard24Regular: ClipboardTask24Regular,
+  
   // Documents
   documentData: DocumentData24Regular,
   documentData20Regular: DocumentData24Regular,

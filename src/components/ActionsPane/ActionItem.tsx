@@ -15,16 +15,12 @@ const useStyles = makeStyles({
     display: 'flex',
     alignItems: 'center',
     cursor: 'pointer',
-    transition: 'background-color 0.1s ease-in-out',
     width: '100%',
     minWidth: 0,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     padding: '4px 12px 4px 10px',
     borderRadius: '8px',
-    '&:hover': {
-      backgroundColor: tokens.colorNeutralBackground1Hover,
-    },
   },
   containerActive: {
     backgroundColor: tokens.colorNeutralBackground1Hover,

@@ -4,12 +4,16 @@ import React from 'react';
 // TypeScript will recognize these imports thanks to our declaration file
 import microsoftTeamsImage from '../assets/connectors/Microsoft Teams.png';
 import office365OutlookImage from '../assets/connectors/Office 365 Outlook.png';
+import azureDevOpsImage from '../assets/connectors/Azure DevOps.png';
+import azureOpenAIImage from '../assets/connectors/Azure OpenAI.png';
 import defaultConnectorImage from '../assets/connectors/Default connector.png';
 
 // Map of module IDs to their imported images
 const connectorImageImports: Record<string, string> = {
   'microsoft-teams': microsoftTeamsImage,
-  'exchange-server': office365OutlookImage
+  'exchange-server': office365OutlookImage,
+  'azure-devops': azureDevOpsImage,
+  'azure-openai': azureOpenAIImage
 };
 
 // Get the image for a connector module

@@ -24,7 +24,7 @@ const useStyles = makeStyles({
       transition: `background-color ${tokens.durationFaster}`,
       borderRadius: '8px',
       '&:hover': {
-        backgroundColor: tokens.colorNeutralBackground2Hover,
+        backgroundColor: tokens.colorNeutralBackground1Hover,
       }
     }
   },
@@ -33,8 +33,9 @@ const useStyles = makeStyles({
       backgroundColor: 'transparent',
       transition: `background-color ${tokens.durationFaster}`,
       borderRadius: '8px',
+      paddingLeft: '40px',
       '&:hover': {
-        backgroundColor: tokens.colorNeutralBackground3Hover,
+        backgroundColor: tokens.colorNeutralBackground1Hover,
       }
     }
   },
@@ -45,7 +46,7 @@ const useStyles = makeStyles({
     gap: tokens.spacingVerticalXS,
     height: '100%',
     overflow: 'auto',
-    padding: `${tokens.spacingVerticalM} 0`,
+    padding: `${tokens.spacingVerticalM} 8px`,
   },
   
   groupContainer: {
@@ -62,7 +63,7 @@ const useStyles = makeStyles({
   groupHeaderContainer: {
     display: 'flex',
     alignItems: 'center',
-    padding: `${tokens.spacingVerticalS} 0`,
+    padding: `${tokens.spacingVerticalS} 0 0 0`,
     borderRadius: '8px',
     justifyContent: 'space-between',
     height: '32px',
@@ -91,7 +92,10 @@ const useStyles = makeStyles({
     flex: 1,
     fontSize: tokens.fontSizeBase300,
     lineHeight: tokens.lineHeightBase300,
-    fontWeight: tokens.fontWeightSemibold
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    minWidth: 0,
   },
   actionItem: {
     backgroundColor: 'transparent',
@@ -106,7 +110,7 @@ const useStyles = makeStyles({
     margin: 0,
     color: tokens.colorNeutralForeground1,
     '&:hover': {
-      backgroundColor: tokens.colorNeutralBackground2Hover,
+      backgroundColor: tokens.colorNeutralBackground1Hover,
     },
   },
   actionItemIcon: {
@@ -133,15 +137,19 @@ const useStyles = makeStyles({
     margin: 0,
   },
   accordionPanel: {
-    padding: tokens.spacingHorizontalS,
-    marginTop: '4px',
+    padding: '0',
+    margin: '0',
+    '& .fui-AccordionPanel': {
+      margin: '0',
+      padding: '0',
+    },
   },
   accordionHeader: {
     '& button.fui-AccordionHeader__button': {
       height: '32px',
       minHeight: '32px',
       maxHeight: '32px',
-      padding: '4px 0',
+      padding: '4px 0 4px 0', /* top, right, bottom, left */
       '& > *': {
         lineHeight: '24px',
       }
@@ -156,7 +164,7 @@ const useStyles = makeStyles({
     justifyContent: 'center',
   },
   categoryHeader: {
-    padding: '0 0 4px 0', /* Remove horizontal padding, keep only bottom padding */
+    padding: '0',
     marginTop: tokens.spacingVerticalS, /* Reduced from M to S */
     display: 'flex',
     alignItems: 'center',
@@ -183,6 +191,22 @@ const useStyles = makeStyles({
     '&:hover': {
       textDecoration: 'underline',
     },
+  },
+  subGroupsContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: tokens.spacingVerticalXS,
+    marginTop: tokens.spacingVerticalXS,
+  },
+  subGroupHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: `${tokens.spacingVerticalS} 0 ${tokens.spacingVerticalS} 40px`,
+  },
+  subGroupTitle: {
+    fontSize: tokens.fontSizeBase200,
+    fontWeight: tokens.fontWeightSemibold,
+    color: tokens.colorBrandForeground2,
   },
 }); 
 
@@ -290,19 +314,14 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
           onToggle={() => toggleGroup(group.id)}
         >
           <AccordionItem value={group.id} className={styles.expandableGroup}>
-            <AccordionHeader size="small">
+            <AccordionHeader size="small" expandIconPosition="end">
               <div className={styles.groupHeaderLeft}>
                 {group.icon && (
                   <span className={`${styles.groupIcon} ${getIconBackgroundClass(group.iconColor)} ${getIconColorClass(group.iconColor)}`}>
                     {getIconByName(group.icon, group.id)}
                   </span>
                 )}
-                <Text 
-                  className={styles.groupTitle}
-                  truncate 
-                  block
-                  weight="semibold"
-                >
+                <Text className={styles.groupTitle}>
                   {group.title}
                 </Text>
               </div>
@@ -327,37 +346,32 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
               
               {/* Render subgroups if they exist */}
               {group.subGroups && group.subGroups.length > 0 && (
-                <Accordion collapsible multiple defaultOpenItems={[]}>
+                <div className={styles.subGroupsContainer}>
                   {group.subGroups.map(subGroup => (
-                    <AccordionItem key={subGroup.id} value={subGroup.id} className={styles.nestedGroup}>
-                      <AccordionHeader size="small">
-                        <div className={styles.groupHeaderLeft}>
-                          <Text className={styles.groupTitle} truncate block>{subGroup.title}</Text>
-                          <Text size={200} weight="regular" style={{marginLeft: 'auto'}}>
-                            {subGroup.items.length} items
-                          </Text>
-                        </div>
-                      </AccordionHeader>
-                      <AccordionPanel>
-                        <div className={styles.groupItemsContainer}>
-                          {subGroup.items.map(item => (
-                            <div key={item.id} className={styles.actionItem}>
-                              <ActionItem 
-                                item={{...item, isFavorite: !!favoriteItems[item.id]}}
-                                onFavoriteChange={(itemId, isFavorite) => {
-                                  setFavoriteItems(prev => ({
-                                    ...prev,
-                                    [itemId]: isFavorite
-                                  }));
-                                }} 
-                              />
-                            </div>
-                          ))}
-                        </div>
-                      </AccordionPanel>
-                    </AccordionItem>
+                    <div key={subGroup.id}>
+                      <div className={styles.subGroupHeader}>
+                        <Text className={styles.subGroupTitle} weight="semibold">
+                          {subGroup.title}
+                        </Text>
+                      </div>
+                      <div className={styles.groupItemsContainer}>
+                        {subGroup.items.map(item => (
+                          <div key={item.id} className={styles.actionItem}>
+                            <ActionItem 
+                              item={{...item, isFavorite: !!favoriteItems[item.id]}}
+                              onFavoriteChange={(itemId, isFavorite) => {
+                                setFavoriteItems(prev => ({
+                                  ...prev,
+                                  [itemId]: isFavorite
+                                }));
+                              }} 
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   ))}
-                </Accordion>
+                </div>
               )}
             </AccordionPanel>
           </AccordionItem>
