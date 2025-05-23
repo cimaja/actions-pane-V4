@@ -6,9 +6,10 @@ export const connector: LibraryItemType = {
   title: 'Azure DevOps',
   type: 'connector',
   icon: '/assets/connectors/Azure DevOps.png',
-  description: 'Automate Azure DevOps tasks such as work item tracking, pull requests, and build/release pipelines.',
+  description: 'Azure DevOps provides services for teams to share code, track work, and ship software - for any language, all in a single package. It is the perfect complement to your IDE.',
   author: 'Microsoft',
   isInstalled: true,
+  category: 'Microsoft' as const,
   tags: ['devops', 'ci/cd', 'version-control']
 };
 

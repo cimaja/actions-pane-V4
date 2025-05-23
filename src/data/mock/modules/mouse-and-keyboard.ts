@@ -6,7 +6,8 @@ export const module: ActionGroup = {
   title: 'Mouse and keyboard',
   icon: 'keyboard24Regular', // Using keyboard icon for mouse and keyboard module
   iconColor: 'orange',
-  tags: ['Interaction'], // Category tag for this module
+  tags: ['Automation', 'UI', 'Input'], // Category tag for this module
+  category: 'Interaction',
   items: [], // This will be populated with references to the actions
   isInstalled: true // Set the module as installed by default
 };

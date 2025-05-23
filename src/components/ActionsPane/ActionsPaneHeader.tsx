@@ -148,7 +148,7 @@ const useStyles = makeStyles({
   },
 });
 
-export type SortOrder = 'name-asc' | 'recent' | 'category';
+export type SortOrder = 'name-asc' | 'name-desc' | 'recent' | 'category';
 
 interface ActionsPaneHeaderProps {
   activeTab: string;
@@ -179,7 +179,6 @@ export const ActionsPaneHeader: React.FC<ActionsPaneHeaderProps> = ({
   const [filterMenuOpen, setFilterMenuOpen] = useState<boolean>(false);
 
   const [filterOptions, setFilterOptions] = useState<FilterOption[]>([
-    { id: 'new', label: 'New', checked: false },
     { id: 'premium', label: 'Premium', checked: false },
     { id: 'dlp', label: 'Data loss prevention', checked: false },
   ]);
@@ -188,7 +187,10 @@ export const ActionsPaneHeader: React.FC<ActionsPaneHeaderProps> = ({
   const activeFilterCount = filterOptions.filter(option => option.checked).length + 
     (sortOrder !== 'name-asc' ? 1 : 0);
 
-  const handleFilterOptionChange = (id: string) => {
+  const handleFilterOptionChange = (id: string, event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    
     setFilterOptions(options => 
       options.map(option => 
         option.id === id ? { ...option, checked: !option.checked } : option
@@ -201,10 +203,6 @@ export const ActionsPaneHeader: React.FC<ActionsPaneHeaderProps> = ({
     setFilterMenuOpen(false);
   };
 
-  const handleClearFilters = () => {
-    setFilterOptions(options => options.map(option => ({ ...option, checked: false })));
-    onSortOrderChange('name-asc');
-  };
 
   return (
     <div className={styles.header}>
@@ -304,13 +302,13 @@ export const ActionsPaneHeader: React.FC<ActionsPaneHeaderProps> = ({
               <div className={styles.menuSection}>Sort by</div>
               <MenuItem 
                 className={styles.menuItem}
-                onClick={() => handleSortOrderChange('name-asc')}
+                onClick={() => handleSortOrderChange('category')}
               >
                 <div className={styles.menuItemContent}>
                   <div className={styles.checkIcon}>
-                    {sortOrder === 'name-asc' && <Checkmark20Regular />}
+                    {sortOrder === 'category' && <Checkmark20Regular />}
                   </div>
-                  <span className={styles.menuItemText}>Name (A to Z)</span>
+                  <span className={styles.menuItemText}>Category</span>
                 </div>
               </MenuItem>
               <MenuItem 
@@ -326,38 +324,50 @@ export const ActionsPaneHeader: React.FC<ActionsPaneHeaderProps> = ({
               </MenuItem>
               <MenuItem 
                 className={styles.menuItem}
-                onClick={() => handleSortOrderChange('category')}
+                onClick={() => handleSortOrderChange('name-asc')}
               >
                 <div className={styles.menuItemContent}>
                   <div className={styles.checkIcon}>
-                    {sortOrder === 'category' && <Checkmark20Regular />}
+                    {sortOrder === 'name-asc' && <Checkmark20Regular />}
                   </div>
-                  <span className={styles.menuItemText}>Category</span>
+                  <span className={styles.menuItemText}>Name (A to Z)</span>
                 </div>
               </MenuItem>
               
               <div className={styles.menuDivider}></div>
               <div className={styles.menuSection}>Filter by</div>
               {filterOptions.map(option => (
-                <MenuItem key={option.id} className={styles.menuItemCheckbox}>
+                <MenuItem 
+                  key={option.id} 
+                  className={styles.menuItemCheckbox}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setFilterOptions(options => 
+                      options.map(opt => 
+                        opt.id === option.id ? { ...opt, checked: !opt.checked } : opt
+                      )
+                    );
+                  }}
+                >
                   <div className={styles.checkboxContainer}>
                     <Checkbox 
                       label={option.label} 
                       checked={option.checked}
-                      onChange={() => handleFilterOptionChange(option.id)}
+                      onChange={(e, data) => {
+                        e.stopPropagation();
+                        setFilterOptions(options => 
+                          options.map(opt => 
+                            opt.id === option.id ? { ...opt, checked: Boolean(data.checked) } : opt
+                          )
+                        );
+                      }}
+                      onClick={(e) => e.stopPropagation()}
                     />
                   </div>
                 </MenuItem>
               ))}
-              
-              {activeFilterCount > 0 && (
-                <>
-                  <div className={styles.menuDivider}></div>
-                  <MenuItem onClick={handleClearFilters} className={styles.clearFiltersButton}>
-                    Clear all filters
-                  </MenuItem>
-                </>
-              )}
+
             </MenuList>
           </MenuPopover>
         </Menu>

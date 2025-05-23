@@ -6,9 +6,10 @@ export const connector: LibraryItemType = {
   title: 'OneDrive for Business',
   type: 'connector',
   icon: '/assets/connectors/OneDrive for Business.png',
-  description: 'Store, access, and share your files securely from anywhere with OneDrive for Business.',
+  description: 'OneDrive for Business is a cloud storage, file hosting service that allows users to sync files and later access them from a web browser or mobile device. Connect to OneDrive for Business to manage your files. You can perform various actions such as upload, update, get, and delete files.',
   author: 'Microsoft',
-  isInstalled: true
+  isInstalled: true,
+  category: 'Microsoft' as const
 };
 
 // Connector actions

@@ -6,9 +6,10 @@ export const connector: LibraryItemType = {
   title: 'SharePoint',
   type: 'connector',
   icon: '/assets/connectors/SharePoint.png',
-  description: 'Create, manage, and share content with SharePoint lists, files, and folders.',
+  description: 'SharePoint helps organizations share and collaborate with colleagues, partners, and customers. You can connect to SharePoint Online or to an on-premises SharePoint 2016 or 2019 farm using the On-Premises Data Gateway to manage documents and list items.',
   author: 'Microsoft',
-  isInstalled: true
+  isInstalled: true,
+  category: 'Microsoft' as const
 };
 
 // Connector actions

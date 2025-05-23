@@ -6,7 +6,8 @@ export const module: ActionGroup = {
   title: 'Testing',
   icon: 'beaker24Regular',
   iconColor: 'red', // Logic category color
-  tags: ['Logic'],
+  tags: ['Testing', 'Quality Assurance', 'Development'], // Category tag for this module
+  category: 'Logic',
   items: [],
   isInstalled: true // Module is installed by default
 };

@@ -6,7 +6,8 @@ export const module: ActionGroup = {
   title: 'Logging',
   icon: 'documentData24Regular',
   iconColor: 'red', // Logic category color
-  tags: ['Logic'],
+  tags: ['Development', 'Debugging', 'Monitoring'], // Category tag for this module
+  category: 'Logic',
   items: [
     {
       id: 'log-message',

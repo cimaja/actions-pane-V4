@@ -6,7 +6,8 @@ export const module: ActionGroup = {
   title: 'IBM Cognitive',
   icon: 'ibmCognitive20Regular',
   iconColor: 'blue',
-  tags: ['Integration'],
+  tags: ['AI/ML', 'IBM', 'Integration'], // Category tag for this module
+  category: 'Integration',
   items: [],
   isInstalled: false
 };

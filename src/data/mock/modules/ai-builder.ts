@@ -6,7 +6,8 @@ export const module: ActionGroup = {
   title: 'AI Builder (Preview)',
   icon: 'aiBuilder20Regular',
   iconColor: 'blue',
-  tags: ['Integration'], // Category tag for this module
+  tags: ['AI/ML', 'Integration', 'Automation'], // Category tag for this module
+  category: 'Integration',
   items: [], // This will be populated with references to the actions
   isInstalled: true // Module is installed by default
 };

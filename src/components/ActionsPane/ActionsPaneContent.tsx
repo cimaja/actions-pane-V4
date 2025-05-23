@@ -8,7 +8,10 @@ import {
   AccordionPanel,
   tokens,
   Divider,
+  Button,
 } from '@fluentui/react-components';
+import { Star24Regular, Search24Regular } from '@fluentui/react-icons';
+import { EmptyState } from '../common/EmptyState';
 import { getIconByName } from '../../utils/iconUtils';
 import { getIconColorClass, getIconBackgroundClass } from '../../utils/iconColorUtils';
 import { ActionItem } from './ActionItem';
@@ -43,16 +46,24 @@ const useStyles = makeStyles({
   container: {
     display: 'flex',
     flexDirection: 'column',
-    gap: tokens.spacingVerticalXS,
     height: '100%',
-    overflow: 'auto',
+    width: '100%',
+    boxSizing: 'border-box',
     padding: `${tokens.spacingVerticalM} 8px`,
+    '&.empty': {
+      overflow: 'visible',
+      height: 'auto',
+    },
+    '&:not(.empty)': {
+      overflowY: 'auto',
+    }
   },
   
   groupContainer: {
     display: 'flex',
     flexDirection: 'column',
     gap: tokens.spacingVerticalXS,
+    minHeight: 'min-content',
   },
 
   groupContent: {
@@ -156,12 +167,19 @@ const useStyles = makeStyles({
     },
   },
   emptyState: {
+    flex: '1 1 auto',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100%',
+    width: '100%',
+    maxWidth: '100%',
+    overflow: 'hidden',
     padding: '16px',
     textAlign: 'center',
     color: tokens.colorNeutralForeground3,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    boxSizing: 'border-box',
   },
   categoryHeader: {
     padding: '0',
@@ -237,25 +255,42 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
       favoriteItems
     );
 
+    // Always make a copy of the array to avoid mutating the original
+    const sortedGroups = [...groups];
+
     // Apply sorting based on sortOrder
-    if (sortOrder === 'category' && ['All', 'Built-in'].includes(activeTab)) {
-      return [...groups].sort((a, b) => {
-        // Get the first tag for each group (assuming it's the category)
-        const categoryA = a.tags?.[0] || 'Other';
-        const categoryB = b.tags?.[0] || 'Other';
-        
-        // If categories are the same, sort by title
-        if (categoryA === categoryB) {
-          return a.title.localeCompare(b.title);
+    switch (sortOrder) {
+      case 'category':
+        if (['All', 'Built-in', 'Connectors'].includes(activeTab)) {
+          return sortedGroups.sort((a, b) => {
+            // Use the category field, falling back to tags for backward compatibility
+            const categoryA = a.category || a.tags?.[0] || 'Other';
+            const categoryB = b.category || b.tags?.[0] || 'Other';
+            
+            // If categories are the same, sort by title
+            if (categoryA === categoryB) {
+              return a.title.localeCompare(b.title);
+            }
+            
+            // Otherwise, sort by category
+            return categoryA.localeCompare(categoryB);
+          });
         }
-        
-        // Otherwise, sort by category
-        return categoryA.localeCompare(categoryB);
-      });
+        break;
+      
+      case 'name-asc':
+        return sortedGroups.sort((a, b) => a.title.localeCompare(b.title));
+      
+      case 'name-desc':
+        return sortedGroups.sort((a, b) => b.title.localeCompare(a.title));
+      
+      case 'recent':
+      default:
+        // Default to the order returned by the data service
+        break;
     }
     
-    // Default sorting (name-asc or recent)
-    return groups;
+    return sortedGroups;
   }, [activeTab, searchQuery, favoriteItems, sortOrder]);
 
   // Toggle group expansion
@@ -273,8 +308,8 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
 
   // Group items by category when sorting by category
   const groupedByCategory = useMemo(() => {
-    // Only apply category grouping for All and Built-in tabs with category sorting
-    if (sortOrder !== 'category' || !['All', 'Built-in'].includes(activeTab)) {
+    // Only apply category grouping for All, Built-in, and Connectors tabs with category sorting
+    if (sortOrder !== 'category' || !['All', 'Built-in', 'Connectors'].includes(activeTab)) {
       return null;
     }
     
@@ -286,7 +321,8 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
     const categoryGroups: Record<string, ActionGroup[]> = {};
     
     installedGroups.forEach(group => {
-      const category = group.tags?.[0] || 'Other';
+      // Use the category field, falling back to tags for backward compatibility
+      const category = group.category || group.tags?.[0] || 'Other';
       if (!categoryGroups[category]) {
         categoryGroups[category] = [];
       }
@@ -385,18 +421,138 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
     return (
       <div className={styles.emptyState}>
         {activeTab === 'Favorites' ? (
-          <Text>No favorites added yet. Click the star icon on any action to add it to favorites.</Text>
+          <EmptyState
+            image={
+              <svg width="49" height="48" viewBox="0 0 49 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M22.303 6.08569C23.2017 4.26474 25.7983 4.26473 26.697 6.08568L31.5493 15.9177L42.3996 17.4943C44.4091 17.7863 45.2115 20.2558 43.7574 21.6732L35.9061 29.3264L37.7595 40.1327C38.1028 42.1342 36.0021 43.6604 34.2047 42.7155L24.5 37.6134L14.7952 42.7155C12.9978 43.6604 10.8971 42.1342 11.2404 40.1327L13.0938 29.3264L5.24255 21.6732C3.78843 20.2558 4.59083 17.7863 6.60037 17.4943L17.4506 15.9177L22.303 6.08569ZM24.5 7.28295L19.6808 17.0476C19.3239 17.7707 18.6341 18.2719 17.8361 18.3879L7.06012 19.9537L14.8577 27.5545C15.4351 28.1173 15.6986 28.9283 15.5623 29.7231L13.7216 40.4555L23.3599 35.3883C24.0736 35.0131 24.9263 35.0131 25.6401 35.3883L35.2784 40.4555L33.4376 29.7231C33.3013 28.9283 33.5648 28.1173 34.1422 27.5545L41.9398 19.9537L31.1638 18.3879C30.3658 18.2719 29.676 17.7707 29.3191 17.0476L24.5 7.28295Z" fill="url(#paint0_linear_11305_18852)"/>
+                <defs>
+                  <linearGradient id="paint0_linear_11305_18852" x1="11.1671" y1="4.71997" x2="37.2091" y2="44.653" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#4C92FD"/>
+                    <stop offset="1" stopColor="#7D51C9"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+            }
+            title="No favorites yet"
+            description="Actions you mark as favorites will appear here for quick access."
+            action={
+              <Button 
+                onClick={() => setActiveTab('All')}
+                appearance="primary"
+              >
+                Browse actions
+              </Button>
+            }
+          />
         ) : (
-          <Text>No actions found. Try adjusting your search or filters.</Text>
+          <EmptyState
+            image={
+              <svg width="49" height="48" viewBox="0 0 49 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21.5 34C28.4036 34 34 28.4036 34 21.5C34 14.5964 28.4036 9 21.5 9C14.5964 9 9 14.5964 9 21.5C9 28.4036 14.5964 34 21.5 34Z" stroke="url(#paint0_linear_search)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M40 40L31 31" stroke="url(#paint1_linear_search)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <defs>
+                  <linearGradient id="paint0_linear_search" x1="11.1671" y1="9" x2="32" y2="34" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#4C92FD"/>
+                    <stop offset="1" stopColor="#7D51C9"/>
+                  </linearGradient>
+                  <linearGradient id="paint1_linear_search" x1="32" y1="31" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#4C92FD"/>
+                    <stop offset="1" stopColor="#7D51C9"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+            }
+            title="No actions found"
+            description="Try adjusting your search or filters."
+            action={
+              <Button 
+                onClick={() => {
+                  // This would typically clear the search, but we need to implement this
+                  // in the parent component. For now, just switch to All tab
+                  setActiveTab('All');
+                }}
+                appearance="primary"
+              >
+                Clear filters
+              </Button>
+            }
+          />
         )}
       </div>
     );
   }
 
-  return (
-    <div className={styles.container}>
-      {groupedByCategory ? (
-        // Render groups organized by category with headers
+  const isEmptyState = filteredGroups.length === 0;
+  const containerClasses = `${styles.container}${isEmptyState ? ' empty' : ''}`;
+
+  const renderContent = () => {
+    if (isEmptyState) {
+      return (
+        <div className={styles.emptyState}>
+          {activeTab === 'Favorites' ? (
+            <EmptyState
+              image={
+                <svg width="49" height="48" viewBox="0 0 49 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M22.303 6.08569C23.2017 4.26474 25.7983 4.26473 26.697 6.08568L31.5493 15.9177L42.3996 17.4943C44.4091 17.7863 45.2115 20.2558 43.7574 21.6732L35.9061 29.3264L37.7595 40.1327C38.1028 42.1342 36.0021 43.6604 34.2047 42.7155L24.5 37.6134L14.7952 42.7155C12.9978 43.6604 10.8971 42.1342 11.2404 40.1327L13.0938 29.3264L5.24255 21.6732C3.78843 20.2558 4.59083 17.7863 6.60037 17.4943L17.4506 15.9177L22.303 6.08569ZM24.5 7.28295L19.6808 17.0476C19.3239 17.7707 18.6341 18.2719 17.8361 18.3879L7.06012 19.9537L14.8577 27.5545C15.4351 28.1173 15.6986 28.9283 15.5623 29.7231L13.7216 40.4555L23.3599 35.3883C24.0736 35.0131 24.9263 35.0131 25.6401 35.3883L35.2784 40.4555L33.4376 29.7231C33.3013 28.9283 33.5648 28.1173 34.1422 27.5545L41.9398 19.9537L31.1638 18.3879C30.3658 18.2719 29.676 17.7707 29.3191 17.0476L24.5 7.28295Z" fill="url(#paint0_linear_11305_18852)"/>
+                <defs>
+                  <linearGradient id="paint0_linear_11305_18852" x1="11.1671" y1="4.71997" x2="37.2091" y2="44.653" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#4C92FD"/>
+                    <stop offset="1" stopColor="#7D51C9"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+            }
+            title="No favorites yet"
+            description="Actions you mark as favorites will appear here for quick access."
+            action={
+              <Button 
+                onClick={() => setActiveTab('All')}
+                appearance="primary"
+              >
+                Browse actions
+              </Button>
+            }
+          />
+        ) : (
+          <EmptyState
+            image={
+              <svg width="49" height="48" viewBox="0 0 49 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21.5 34C28.4036 34 34 28.4036 34 21.5C34 14.5964 28.4036 9 21.5 9C14.5964 9 9 14.5964 9 21.5C9 28.4036 14.5964 34 21.5 34Z" stroke="url(#paint0_linear_search)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M40 40L31 31" stroke="url(#paint1_linear_search)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <defs>
+                  <linearGradient id="paint0_linear_search" x1="11.1671" y1="9" x2="32" y2="34" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#4C92FD"/>
+                    <stop offset="1" stopColor="#7D51C9"/>
+                  </linearGradient>
+                  <linearGradient id="paint1_linear_search" x1="32" y1="31" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#4C92FD"/>
+                    <stop offset="1" stopColor="#7D51C9"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+            }
+            title="No actions found"
+            description="Try adjusting your search or filters."
+            action={
+              <Button 
+                onClick={() => {
+                  // This would typically clear the search, but we need to implement this
+                  // in the parent component. For now, just switch to All tab
+                  setActiveTab('All');
+                }}
+                appearance="primary"
+              >
+                Clear filters
+              </Button>
+            }
+          />
+          )}
+        </div>
+      );
+    }
+
+    if (groupedByCategory) {
+      return (
         groupedByCategory.map(({ category, groups }) => (
           <React.Fragment key={category}>
             <div className={styles.categoryHeader}>
@@ -432,10 +588,12 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
             </div>
           </React.Fragment>
         ))
-      ) : (
-        // Render groups without category headers
-        installedGroups.map(group => renderGroup(group))
-      )}
-    </div>
-  );
+      );
+    }
+
+    // Render groups without category headers
+    return installedGroups.map(group => renderGroup(group));
+  };
+
+  return <div className={containerClasses}>{renderContent()}</div>;
 };

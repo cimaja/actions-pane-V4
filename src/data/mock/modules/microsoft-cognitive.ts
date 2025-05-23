@@ -65,7 +65,8 @@ export const module: ActionGroup = {
   title: 'Microsoft Cognitive',
   icon: 'brainCircuit24Regular',
   iconColor: 'blue',
-  tags: ['Integration'],
+  tags: ['AI/ML', 'Microsoft', 'Integration'], // Category tag for this module
+  category: 'Integration',
   items: [],
   subGroups: [
     bingSpellCheckGroup,

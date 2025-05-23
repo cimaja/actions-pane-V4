@@ -6,7 +6,8 @@ export const module: ActionGroup = {
   title: 'Work queues',
   icon: 'listBarTree20Regular',
   iconColor: 'blue',
-  tags: ['Integration'], // Category tag for this module
+  tags: ['Automation', 'Queues', 'Workflow'], // Category tag for this module
+  category: 'Integration',
   items: [], // This will be populated with references to the actions
   isInstalled: false // Module is not installed by default
 };

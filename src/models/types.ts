@@ -6,12 +6,12 @@ export interface ActionItemType {
   description?: string;
   isFavorite?: boolean;
   moduleId?: string; // Adding moduleId for actions that belong to a module
+  tags?: string[]; // Adding tags for categorization and search
 }
 
 // Detailed action item with additional metadata
 export interface DetailedActionItem extends ActionItemType {
   moduleId: string;
-  tags?: string[];
   usage?: string;
   examples?: string[];
   parameters?: {
@@ -31,8 +31,31 @@ export interface ActionGroup {
   icon?: string; // Adding icon property
   iconColor?: string; // Adding iconColor property for Fluent UI theming
   tags?: string[]; // Adding tags for categorization
+  category?: ModuleCategory; // Adding category for module/connector classification
   isInstalled?: boolean; // Adding isInstalled flag for module installation status
 }
+
+// Module categories
+export type ModuleCategory = 
+  | 'Data' 
+  | 'Integration' 
+  | 'Interaction' 
+  | 'Logic' 
+  | 'Scripting' 
+  | 'System'
+  | 'Connectors';
+
+// Connector categories
+export type ConnectorCategory = 
+  | 'Microsoft'
+  | 'Third party'
+  | 'Document Management'
+  | 'Development & IT'
+  | 'AI & Machine Learning'
+  | 'Cloud Storage'
+  | 'Security'
+  | 'Maps & Location'
+  | 'Productivity';
 
 // Library item type definition
 export interface LibraryItemType {
@@ -42,6 +65,7 @@ export interface LibraryItemType {
   icon?: string;
   iconColor?: string;
   tags?: string[];
+  category?: ModuleCategory | ConnectorCategory; // Single category for the item
   description?: string;
   author?: string;
   lastUpdated?: string;

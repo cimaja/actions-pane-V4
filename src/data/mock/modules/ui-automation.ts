@@ -6,7 +6,8 @@ export const module: ActionGroup = {
   title: 'UI automation',
   icon: 'laptop24Regular',
   iconColor: 'orange',
-  tags: ['Interaction'], // Category tag for this module
+  tags: ['Automation', 'UI', 'Testing'], // Category tag for this module
+  category: 'Interaction',
   items: [], // This will be populated with references to the actions
   isInstalled: true, // Set as installed by default
   subGroups: (() => {

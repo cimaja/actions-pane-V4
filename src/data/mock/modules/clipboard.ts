@@ -6,7 +6,8 @@ export const module: ActionGroup = {
   title: 'Clipboard',
   icon: 'clipboard24Regular', // Using cube icon since Paste isn't in our icon set
   iconColor: 'orange',
-  tags: ['Interaction'], // Category tag for this module
+  tags: ['Productivity', 'System'], // Category tag for this module
+  category: 'Interaction',
   items: [], // This will be populated with references to the actions
   isInstalled: true // Set the module as installed by default
 };

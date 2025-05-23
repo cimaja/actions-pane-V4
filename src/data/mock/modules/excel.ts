@@ -6,7 +6,8 @@ export const module: ActionGroup = {
   title: 'Excel',
   icon: 'excel',
   iconColor: 'blue', // Integration category color
-  tags: ['Integration'],
+  tags: ['Office', 'Spreadsheet', 'Data'], // Category tag for this module
+  category: 'Integration',
   isInstalled: false, // Module is installed by default
   items: [],
   subGroups: [

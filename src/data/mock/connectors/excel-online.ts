@@ -6,9 +6,10 @@ export const connector: LibraryItemType = {
   title: 'Excel Online (Business)',
   type: 'connector',
   icon: '/assets/connectors/Excel Online (Business).png',
-  description: 'Work with data in Excel workbooks stored in OneDrive for Business or SharePoint.',
+  description: 'Excel Online (Business) connector lets you work with Excel files in document libraries supported by Microsoft Graph (OneDrive for Business, SharePoint Sites, and Office 365 Groups).',
   author: 'Microsoft',
-  isInstalled: true
+  isInstalled: true,
+  category: 'Microsoft' as const
 };
 
 // Connector actions

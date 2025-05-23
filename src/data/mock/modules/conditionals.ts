@@ -6,7 +6,8 @@ export const module: ActionGroup = {
   title: 'Conditionals',
   icon: 'organization24Regular',
   iconColor: 'red',
-  tags: ['Logic'], // Category tag for this module
+  tags: ['Logic', 'Flow Control', 'Development'], // Category tag for this module
+  category: 'Logic',
   items: [], // This will be populated with references to the actions
   isInstalled: true // Set the module as installed by default
 };

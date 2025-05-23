@@ -6,9 +6,10 @@ export const connector: LibraryItemType = {
   title: 'Office 365 Outlook',
   type: 'connector',
   icon: '/assets/connectors/Office 365 Outlook.png',
-  description: 'Send and receive emails, manage your calendar, and handle contacts in Office 365.',
+  description: 'Microsoft Office 365 is a cloud-based service that is designed to help meet your organization\'s needs for robust security, reliability, and user productivity.',
   author: 'Microsoft',
-  isInstalled: true
+  isInstalled: true,
+  category: 'Microsoft' as const
 };
 
 // Connector actions

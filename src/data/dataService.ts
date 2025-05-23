@@ -1,4 +1,4 @@
-import { ActionGroup, LibraryItemType, TabType, LibraryCategoryType, DetailedActionItem } from '../models/types';
+import { ActionGroup, LibraryItemType, TabType, LibraryCategoryType, DetailedActionItem, ModuleCategory } from '../models/types';
 import * as moduleFiles from './mock/modules';
 import { ActionItemType } from '../models/types';
 import * as connectorFiles from './mock/connectors';
@@ -46,9 +46,15 @@ export class DataService {
   
   /**
    * Get all modules that should be displayed in the Actions Pane
+   * A module should be displayed if it has either:
+   * 1. A defined category, or
+   * 2. At least one tag
    */
   getDisplayModules(): ActionGroup[] {
-    return this._modules.filter(module => module.tags && module.tags.length > 0);
+    return this._modules.filter(module => 
+      (module.category !== undefined) || 
+      (module.tags && module.tags.length > 0)
+    );
   }
   
   /**
@@ -59,12 +65,11 @@ export class DataService {
   }
   
   /**
-   * Get modules by category tag
+   * Get modules by category
+   * @param category The category to filter by (must be a valid ModuleCategory)
    */
-  getModulesByCategory(category: string): ActionGroup[] {
-    return this._modules.filter(module => 
-      module.tags && module.tags.includes(category)
-    );
+  getModulesByCategory(category: ModuleCategory): ActionGroup[] {
+    return this._modules.filter(module => module.category === category);
   }
   
   /**
@@ -195,6 +200,7 @@ export class DataService {
           icon: module.icon || '📦',
           iconColor: module.iconColor,
           tags: module.tags,
+          category: module.category, // Include the module's category
           description: `Contains ${module.items.length} actions`,
           isInstalled: module.isInstalled === true, // Respect the module's isInstalled flag, ensuring it's a boolean
           actions: module.items
@@ -261,7 +267,7 @@ export class DataService {
         const icon = module?.icon || connector?.icon;
         const iconColor = module?.iconColor || connector?.iconColor;
         
-        return {
+        const actionGroup: ActionGroup = {
           id: moduleId,
           title,
           icon,
@@ -269,6 +275,13 @@ export class DataService {
           items: items,
           tags: module?.tags || connector?.tags || []
         };
+
+        // Only add category if it's defined in the module
+        if (module?.category) {
+          actionGroup.category = module.category;
+        }
+        
+        return actionGroup;
       });
     }
     
@@ -280,34 +293,53 @@ export class DataService {
         !module.tags?.includes('connector')
       );
       
-      // Get connector modules in the same format as regular modules
+      // Get connector modules in the 'Connectors' category
       const connectorModules = this.getInstalledConnectors().map(connector => {
-        return {
+        const connectorGroup: ActionGroup = {
           id: connector.id,
           title: connector.title,
           icon: connector.icon,
           items: this._connectorActions.filter(action => action.moduleId === connector.id),
           tags: ['connector']
         };
+
+        // Set category for connectors to 'Connectors'
+        connectorGroup.category = 'Connectors';
+        
+        return connectorGroup;
       });
       
-      // Add connectors directly to the module list
-      modules = [...displayModules, ...connectorModules];
+      // Get integration modules (modules with category 'Integration')
+      const integrationModules = displayModules.filter(module => module.category === 'Integration');
+      
+      // Get other modules (excluding integrations)
+      const otherModules = displayModules.filter(module => module.category !== 'Integration');
+      
+      // Combine all modules with connectors at the end
+      modules = [...otherModules, ...integrationModules, ...connectorModules];
     } else if (activeTab === 'Built-in') {
       modules = this.getDisplayModules().filter(module => 
         !module.tags?.includes('connector')
       );
     } else if (activeTab === 'Connectors') {
-      // Display each connector directly without grouping by author
-      modules = this.getInstalledConnectors().map(connector => {
-        return {
+      // Display connectors grouped by their categories
+      const connectorItems = this.getInstalledConnectors().map(connector => {
+        const connectorGroup: ActionGroup = {
           id: connector.id,
           title: connector.title,
           icon: connector.icon,
           items: this._connectorActions.filter(action => action.moduleId === connector.id),
-          tags: ['connector']
+          tags: connector.tags || [],
+          // Use the connector's category if available, otherwise use 'Connectors' as default
+          category: (connector.category as ModuleCategory) || 'Connectors'
         };
+        
+        return connectorGroup;
       });
+      
+      // If sortOrder is 'category', we'll let the ActionsPaneContent component handle the grouping
+      // Otherwise, just return the connector items as is
+      modules = connectorItems;
     }
     
     // Apply search filter if query exists
@@ -316,23 +348,35 @@ export class DataService {
       modules = modules.map(module => {
         // Filter items within each module
         const filteredItems = module.items.filter(item => 
-          item.title.toLowerCase().includes(normalizedQuery)
+          item.title.toLowerCase().includes(normalizedQuery) ||
+          item.description?.toLowerCase().includes(normalizedQuery) ||
+          item.tags?.some((tag: string) => tag.toLowerCase().includes(normalizedQuery))
         );
         
         // Filter subgroups if they exist
         const filteredSubGroups = module.subGroups?.map(subGroup => {
           const filteredSubItems = subGroup.items.filter(item => 
-            item.title.toLowerCase().includes(normalizedQuery)
+            item.title.toLowerCase().includes(normalizedQuery) ||
+            item.description?.toLowerCase().includes(normalizedQuery) ||
+            item.tags?.some((tag: string) => tag.toLowerCase().includes(normalizedQuery))
           );
           return { ...subGroup, items: filteredSubItems };
         }).filter(subGroup => subGroup.items.length > 0);
+        
+        // Only include the module if it has matching items or subgroups
+        const hasMatchingItems = filteredItems.length > 0;
+        const hasMatchingSubGroups = filteredSubGroups && filteredSubGroups.length > 0;
+        
+        if (!hasMatchingItems && !hasMatchingSubGroups) {
+          return null;
+        }
         
         return { 
           ...module, 
           items: filteredItems,
           subGroups: filteredSubGroups
         };
-      }).filter(module => module.items.length > 0 || (module.subGroups && module.subGroups.length > 0));
+      }).filter(Boolean) as ActionGroup[]; // Filter out null values and cast back to ActionGroup[]
     }
     
     return modules;

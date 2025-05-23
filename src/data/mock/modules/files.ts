@@ -6,7 +6,8 @@ export const module: ActionGroup = {
   title: 'Files',
   icon: 'document24Regular',
   iconColor: 'amber',
-  tags: ['Data'], // Category tag for this module
+  tags: ['Files', 'Data', 'System'], // Category tag for this module
+  category: 'Data',
   items: [], // This will be populated with references to the actions
   isInstalled: true // Set the module as installed by default
 };

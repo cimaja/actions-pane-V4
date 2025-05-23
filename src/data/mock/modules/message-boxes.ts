@@ -6,7 +6,8 @@ export const module: ActionGroup = {
   title: 'Message boxes',
   icon: 'channel24Regular', // Using channel icon for message boxes
   iconColor: 'orange',
-  tags: ['Interaction'], // Category tag for this module
+  tags: ['UI', 'Interaction', 'User Feedback'], // Category tag for this module
+  category: 'Interaction',
   items: [], // This will be populated with references to the actions
   isInstalled: true // Set the module as installed by default
 };

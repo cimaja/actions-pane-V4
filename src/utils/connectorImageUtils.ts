@@ -7,11 +7,32 @@ import office365OutlookImage from '../assets/connectors/Office 365 Outlook.png';
 import azureDevOpsImage from '../assets/connectors/Azure DevOps.png';
 import azureOpenAIImage from '../assets/connectors/Azure OpenAI.png';
 import adobeAcrobatSignImage from '../assets/connectors/Adobe Acrobat Sign.png';
-import onedriveBusinessImage from '../assets/connectors/OneDrive for Business.png';
+import adobePdfServicesImage from '../assets/connectors/Adobe PDF Services.png';
+import azureBlobStorageImage from '../assets/connectors/Azure Blob Storage.png';
+import azureKeyVaultImage from '../assets/connectors/Azure Key Vault.png';
+import bingMapsImage from '../assets/connectors/Bing Maps.png';
+import bitlyImage from '../assets/connectors/Bitly.png';
+import boxImage from '../assets/connectors/Box.png';
+import dropboxImage from '../assets/connectors/Dropbox.png';
+import dynamics365Image from '../assets/connectors/Dynamics 365 Business Central.png';
 import excelOnlineImage from '../assets/connectors/Excel Online (Business).png';
 import githubImage from '../assets/connectors/GitHub.png';
+import googleCalendarImage from '../assets/connectors/Google Calendar.png';
+import googleDriveImage from '../assets/connectors/Google Drive.png';
+import googleSheetsImage from '../assets/connectors/Google Sheets.png';
+import googleTasksImage from '../assets/connectors/Google Tasks.png';
+import jiraImage from '../assets/connectors/Jira.png';
 import microsoftFormsImage from '../assets/connectors/Microsoft Forms.png';
+import microsoftTodoImage from '../assets/connectors/Microsoft To-Do (Business).png';
+import onedriveBusinessImage from '../assets/connectors/OneDrive for Business.png';
+import onenoteImage from '../assets/connectors/OneNote (Business).png';
+import plannerImage from '../assets/connectors/Planner.png';
+import powerBiImage from '../assets/connectors/Power BI.png';
+import salesforceImage from '../assets/connectors/Salesforce.png';
+import sapImage from '../assets/connectors/SAP.png';
 import sharepointImage from '../assets/connectors/SharePoint.png';
+import sqlServerImage from '../assets/connectors/SQL Server.png';
+import surveyMonkeyImage from '../assets/connectors/SurveyMonkey.png';
 import wordOnlineImage from '../assets/connectors/Word Online (Business).png';
 import defaultConnectorImage from '../assets/connectors/Default connector.png';
 
@@ -21,13 +42,35 @@ const connectorImageImports: Record<string, string> = {
   'exchange-server': office365OutlookImage,
   'azure-devops': azureDevOpsImage,
   'azure-openai': azureOpenAIImage,
+  'azure-blob-storage': azureBlobStorageImage,
+  'azure-key-vault': azureKeyVaultImage,
   'adobe-acrobat-sign': adobeAcrobatSignImage,
+  'adobe-pdf-services': adobePdfServicesImage,
+  'bing-maps': bingMapsImage,
+  'bitly': bitlyImage,
+  'box': boxImage,
+  'dropbox': dropboxImage,
+  'dynamics365': dynamics365Image,
   'office365-outlook': office365OutlookImage,
-  'onedrive-business': onedriveBusinessImage,
+  'onedrive': onedriveBusinessImage,
+  'onedrive-business': onedriveBusinessImage, // Alias for backward compatibility
   'excel-online': excelOnlineImage,
   'github': githubImage,
+  'google-calendar': googleCalendarImage,
+  'google-drive': googleDriveImage,
+  'google-sheets': googleSheetsImage,
+  'google-tasks': googleTasksImage,
+  'jira': jiraImage,
   'microsoft-forms': microsoftFormsImage,
+  'microsoft-todo': microsoftTodoImage,
+  'onenote': onenoteImage,
+  'planner': plannerImage,
+  'power-bi': powerBiImage,
+  'salesforce': salesforceImage,
+  'sap': sapImage,
   'sharepoint': sharepointImage,
+  'sql-server': sqlServerImage,
+  'surveymonkey': surveyMonkeyImage,
   'word-online': wordOnlineImage
 };
 

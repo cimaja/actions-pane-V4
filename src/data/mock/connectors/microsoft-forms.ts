@@ -6,9 +6,10 @@ export const connector: LibraryItemType = {
   title: 'Microsoft Forms',
   type: 'connector',
   icon: '/assets/connectors/Microsoft Forms.png',
-  description: 'Create surveys, quizzes, and polls, and easily view results as they come in.',
+  description: 'Microsoft Forms is a new part of Office 365 Education that allows teachers and students to quickly and easily create custom quizzes, surveys, questionnaires, registrations and more.',
   author: 'Microsoft',
-  isInstalled: true
+  isInstalled: true,
+  category: 'Microsoft' as const
 };
 
 // Connector actions

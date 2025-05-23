@@ -6,7 +6,8 @@ export const module: ActionGroup = {
   title: 'Access',
   icon: 'access20Regular',
   iconColor: 'blue',
-  tags: ['Integration'],
+  category: 'Integration',
+  tags: ['Office', 'Integration', 'Database'],
   items: [],
   isInstalled: false // Module is not installed by default
 };

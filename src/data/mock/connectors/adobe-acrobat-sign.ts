@@ -6,9 +6,11 @@ export const connector: LibraryItemType = {
   title: 'Adobe Acrobat Sign',
   type: 'connector',
   icon: '/assets/connectors/Adobe Acrobat Sign.png',
-  description: 'Automate document signing workflows with Adobe Acrobat Sign.',
+  description: 'Adobe is the most trusted digital document sign service in the world. With Adobe Acrobat Sign, you can transform manual processes into all-digital experiences. Incorporate Adobe Acrobat Sign functionality into your favorite applications to create, send and monitor the status of agreements.',
   author: 'Adobe',
-  isInstalled: true
+  isInstalled: true,
+  category: 'Third party' as const,
+  tags: ['document']
 };
 
 // Connector actions

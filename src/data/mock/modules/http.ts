@@ -6,7 +6,8 @@ export const module: ActionGroup = {
   title: 'HTTP',
   icon: 'customGlobe20Regular',
   iconColor: 'blue',
-  tags: ['Integration'], // Category tag for this module
+  tags: ['Web', 'API', 'Networking'], // Category tag for this module
+  category: 'Integration',
   items: [], // This will be populated with references to the actions
   isInstalled: true // Set the module as installed by default
 };

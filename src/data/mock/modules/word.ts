@@ -6,7 +6,8 @@ export const module: ActionGroup = {
   title: 'Word',
   icon: 'word',
   iconColor: 'blue', // Integration category color
-  tags: ['Integration'],
+  tags: ['Office', 'Word Processing', 'Documents'], // Category tag for this module
+  category: 'Integration',
   isInstalled: false, // Module is installed by default
   items: [
     {

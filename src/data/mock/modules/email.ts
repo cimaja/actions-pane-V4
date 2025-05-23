@@ -6,7 +6,8 @@ export const module: ActionGroup = {
   title: 'Email',
   icon: 'mail20Regular',
   iconColor: 'blue',
-  tags: ['Integration'], // Category tag for this module
+  tags: ['Communication', 'Email', 'Integration'], // Category tag for this module
+  category: 'Integration',
   items: [], // This will be populated with references to the actions
   isInstalled: false // Module is not installed by default
 };

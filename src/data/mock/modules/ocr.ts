@@ -6,7 +6,8 @@ export const module: ActionGroup = {
   title: 'OCR',
   icon: 'scanText24Regular',
   iconColor: 'orange',
-  tags: ['Interaction'], // Category tag for this module
+  tags: ['AI/ML', 'Image Processing', 'Data Extraction'], // Category tag for this module
+  category: 'Interaction',
   items: [], // This will be populated with references to the actions
   isInstalled: false // Set the module as installed by default
 };

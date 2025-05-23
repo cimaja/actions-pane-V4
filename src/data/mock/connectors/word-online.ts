@@ -6,9 +6,10 @@ export const connector: LibraryItemType = {
   title: 'Word Online (Business)',
   type: 'connector',
   icon: '/assets/connectors/Word Online (Business).png',
-  description: 'Create, edit, and format text documents stored in OneDrive for Business or SharePoint.',
+  description: 'Word Online (Business) connector lets you work with Word files in document libraries supported by Microsoft Graph (OneDrive for Business, SharePoint Online Sites, and Office 365 Groups).',
   author: 'Microsoft',
-  isInstalled: true
+  isInstalled: true,
+  category: 'Microsoft' as const
 };
 
 // Connector actions

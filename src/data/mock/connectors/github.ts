@@ -6,9 +6,10 @@ export const connector: LibraryItemType = {
   title: 'GitHub',
   type: 'connector',
   icon: '/assets/connectors/GitHub.png',
-  description: 'Automate workflows with GitHub repositories, issues, and pull requests.',
+  description: 'GitHub is a web-based Git repository hosting service. It offers all of the distributed revision control and source code management (SCM) functionality of Git as well as adding its own features.',
   author: 'Microsoft',
-  isInstalled: true
+  isInstalled: true,
+  category: 'Third party' as const
 };
 
 // Connector actions

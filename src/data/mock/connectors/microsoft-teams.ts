@@ -6,9 +6,10 @@ export const connector: LibraryItemType = {
   title: 'Microsoft Teams',
   type: 'connector',
   icon: '/assets/connectors/Microsoft Teams.png',
-  description: 'Automate tasks in Microsoft Teams such as sending messages, creating teams, and managing channels.',
+  description: 'Microsoft Teams enables you to get all your content, tools and conversations in the Team workspace with Microsoft 365.',
   author: 'Microsoft',
-  isInstalled: true
+  isInstalled: true,
+  category: 'Microsoft' as const
 };
 
 // Connector actions

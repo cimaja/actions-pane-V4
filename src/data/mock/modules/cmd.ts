@@ -6,7 +6,8 @@ export const module: ActionGroup = {
   title: 'CMD',
   icon: 'code24Regular',
   iconColor: 'teal',
-  tags: ['Scripting'], // Category tag for this module
+  tags: ['System', 'Automation', 'Scripting'], // Category tag for this module
+  category: 'Scripting',
   items: [], // This will be populated with references to the actions
   isInstalled: false // Module is not installed by default
 };

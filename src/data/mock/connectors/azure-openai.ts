@@ -6,9 +6,10 @@ export const connector: LibraryItemType = {
   title: 'Azure OpenAI',
   type: 'connector',
   icon: '/assets/connectors/Azure OpenAI.png',
-  description: 'Access Azure OpenAI services for advanced AI capabilities including language models and embeddings.',
+  description: 'Easily integrate Azure OpenAI\'s cutting-edge artificial intelligence capabilities into your workflows.',
   author: 'Microsoft',
   isInstalled: true,
+  category: 'Microsoft' as const,
   tags: ['ai', 'machine-learning', 'language-models']
 };
 

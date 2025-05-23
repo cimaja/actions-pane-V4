@@ -6,7 +6,8 @@ export const module: ActionGroup = {
   title: 'FTP',
   icon: 'arrowCircleDownUp20Regular',
   iconColor: 'blue',
-  tags: ['Integration'], // Category tag for this module
+  tags: ['Networking', 'File Transfer', 'Integration'], // Category tag for this module
+  category: 'Integration',
   items: [], // This will be populated with references to the actions
   isInstalled: true // Module is installed by default
 };

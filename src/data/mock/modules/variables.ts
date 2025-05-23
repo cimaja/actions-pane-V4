@@ -6,7 +6,8 @@ export const module: ActionGroup = {
   title: 'Variables',
   icon: 'bracesVariable24Regular',
   iconColor: 'red',
-  tags: ['Logic'], // Category tag for this module
+  tags: ['Data', 'Variables', 'Development'], // Category tag for this module
+  category: 'Logic',
   items: [], // This will be populated with references to the actions
   isInstalled: true, // Set the module as installed by default
   subGroups: [] // Will be populated with subcategories

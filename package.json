@@ -20,6 +20,7 @@
     "@fluentui/react": "^8.110.7",
     "@fluentui/react-components": "^9.30.0",
     "@fluentui/react-icons": "^2.0.206",
+    "@fluentui/react-nav-preview": "^0.13.8",
     "ajv": "^8.12.0",
     "ajv-keywords": "^5.1.0",
     "react": "^18.2.0",
