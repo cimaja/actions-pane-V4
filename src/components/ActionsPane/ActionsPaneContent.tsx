@@ -296,20 +296,14 @@ const useStyles = makeStyles({
     gap: '8px',
     flex: 1,
   },
-  moduleIcon: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '24px',
-    height: '24px',
-    borderRadius: '8px',
-    '& svg': {
-      width: '16px',
-      height: '16px',
-    },
-  },
+  // Using the same styles as groupIcon for consistency
   moduleTitle: {
     fontSize: tokens.fontSizeBase300,
+    lineHeight: tokens.lineHeightBase300,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    minWidth: 0,
     fontWeight: tokens.fontWeightSemibold,
     color: tokens.colorNeutralForeground1,
   },
@@ -568,10 +562,14 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
                 {group.items.map(item => (
                   <div key={item.id} className={styles.actionItem}>
                     <ActionItem 
-                      item={{...item, isFavorite: !!favoriteItems[item.id]}}
+                      item={{
+                        ...item, 
+                        isFavorite: !!favoriteItems[item.id],
+                        // Use the group's iconColor for the action item if the item doesn't have one
+                        iconColor: item.iconColor || group.iconColor
+                      }}
                       onFavoriteChange={(itemId, isFavorite) => {
                         onFavoriteChange && onFavoriteChange(itemId, isFavorite);
-
                       }} 
                     />
                   </div>
@@ -632,14 +630,12 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
               >
                 <div className={styles.moduleHeader}>
                   {moduleInfo?.icon && (
-                    <div className={mergeClasses(
-                      styles.moduleIcon,
-                      getIconBackgroundClass(moduleInfo.iconColor || '')
-                    )}>
+                    <span className={`${styles.groupIcon} ${getIconBackgroundClass(moduleInfo.iconColor)} ${getIconColorClass(moduleInfo.iconColor)}`}>
                       {isConnector(moduleId) 
                         ? createConnectorImageElement(moduleId)
-                        : getIconByName(moduleInfo.icon)}
-                    </div>
+                        : getIconByName(moduleInfo.icon, moduleId)
+                      }
+                    </span>
                   )}
                   <Text className={styles.moduleTitle}>{moduleInfo?.title || `Module ${moduleId}`}</Text>
                 </div>

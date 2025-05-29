@@ -8,6 +8,7 @@ import {
 } from '@fluentui/react-components';
 import { Star24Regular, Star24Filled } from '@fluentui/react-icons';
 import { ActionItemType } from '../../models/types';
+import { getIconColorClass, getIconBackgroundClass } from '../../utils/iconColorUtils';
 
 const useStyles = makeStyles({
   /* Container styles */
@@ -27,15 +28,22 @@ const useStyles = makeStyles({
   },
   /* Content styles */
   icon: {
-    marginRight: '8px',
     fontSize: '20px',
-    width: '24px',
-    height: '24px',
+    width: '100%',
+    height: '100%',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    color: tokens.colorNeutralForeground2,
     borderRadius: '8px',
+  },
+  iconWrapper: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '24px',
+    height: '24px',
+    borderRadius: '4px',
+    marginRight: '8px',
   },
   title: {
     flex: 1,
@@ -149,7 +157,15 @@ export const ActionItem: React.FC<ActionItemProps> = ({ item, onFavoriteChange }
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        <span className={styles.icon}>{item.icon}</span>
+        <span className={mergeClasses(
+          styles.iconWrapper,
+          item.iconColor ? getIconBackgroundClass(item.iconColor) : ''
+        )}>
+          <span className={mergeClasses(
+            styles.icon,
+            item.iconColor ? getIconColorClass(item.iconColor) : ''
+          )}>{item.icon}</span>
+        </span>
         <span className={styles.title}>{item.title}</span>
         <Button
           className={favoriteButtonClass}

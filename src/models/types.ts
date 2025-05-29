@@ -3,6 +3,7 @@ export interface ActionItemType {
   id: string;
   title: string;
   icon?: string; // Making icon optional
+  iconColor?: string; // Adding iconColor property for Fluent UI theming
   description?: string;
   isFavorite?: boolean;
   moduleId?: string; // Adding moduleId for actions that belong to a module
