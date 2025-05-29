@@ -304,7 +304,7 @@ const useStyles = makeStyles({
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     minWidth: 0,
-    fontWeight: tokens.fontWeightSemibold,
+    fontWeight: tokens.fontWeightRegular,
     color: tokens.colorNeutralForeground1,
   },
   uninstalledActions: {
@@ -312,6 +312,12 @@ const useStyles = makeStyles({
     flexDirection: 'column',
     gap: tokens.spacingVerticalS,
     marginTop: tokens.spacingVerticalXS,
+  },
+  libraryResultsMessage: {
+    padding: '8px',
+    backgroundColor: tokens.colorNeutralBackground1,
+    borderRadius: '8px',
+    marginBottom: tokens.spacingVerticalS,
   },
   uninstalledAction: {
     fontSize: tokens.fontSizeBase200,
@@ -410,7 +416,7 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
     
     // If we're showing uninstalled items, force a refresh of the data
     if (!showUninstalledItems && searchQuery && totalUninstalledCount && totalUninstalledCount > 0) {
-      // This will trigger the uninstalledActions useMemo to recalculate
+      // Force refresh the uninstalled actions data
       dataService.searchUninstalledActions(searchQuery);
     }
   };
@@ -442,7 +448,7 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
       return actions;
     }
     return [];
-  }, [searchQuery, totalUninstalledCount, activeTab]);
+  }, [searchQuery, totalUninstalledCount, activeTab, showUninstalledItems]);
   
   // Calculate filtered uninstalled count based on active tab
   // Force recalculation when activeTab changes
@@ -613,14 +619,30 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
       return null;
     }
     
+    // Check if we actually have any uninstalled actions to show after filtering
+    if (Object.keys(groupedUninstalledActions).length === 0) {
+      return (
+        <div className={styles.uninstalledSection}>
+          <div className={styles.uninstalledContainer}>
+            <Text className={styles.moduleTitle}>No uninstalled items match your search in this tab.</Text>
+          </div>
+        </div>
+      );
+    }
+    
     return (
       <div className={styles.uninstalledSection}>
-        
         <div className={styles.uninstalledContainer}>
           {Object.entries(groupedUninstalledActions).map(([moduleId, actions]) => {
             // Get module info if available
             const moduleInfo = dataService.getModuleById(moduleId) || 
                             dataService.getConnectorById(moduleId);
+            
+            // Skip modules that don't match the active tab filter
+            if ((activeTab === 'Built-in' && isConnector(moduleId)) || 
+                (activeTab === 'Connectors' && !isConnector(moduleId))) {
+              return null;
+            }
             
             return (
               <div 
@@ -642,7 +664,7 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
                 <ArrowUpRight16Regular />
               </div>
             );
-          })}
+          }).filter(Boolean)}
         </div>
       </div>
     );
@@ -718,8 +740,73 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
   const containerClasses = `${styles.container}${isEmptyState ? ' empty' : ''}`;
 
   const renderContent = () => {
-    // If there's a search query and uninstalled items, show toggle
-    if (searchQuery && filteredUninstalledCount && filteredUninstalledCount > 0) {
+    // Check if we actually have any uninstalled actions to show after filtering
+    const hasUninstalledItemsToShow = Object.entries(groupedUninstalledActions)
+      .some(([moduleId, _]) => {
+        // Check if this module matches the current tab filter
+        if (activeTab === 'Built-in') {
+          return !isConnector(moduleId);
+        } else if (activeTab === 'Connectors') {
+          return isConnector(moduleId);
+        }
+        return true; // For 'All' tab, all modules match
+      });
+    
+    // Check if we have no installed items but have uninstalled items
+    const hasNoInstalledResults = filteredGroups.length === 0;
+    const shouldShowLibraryResults = hasNoInstalledResults && hasUninstalledItemsToShow && searchQuery;
+    
+    // If there's a search query and uninstalled items that match the current tab
+    if (searchQuery && filteredUninstalledCount && filteredUninstalledCount > 0 && hasUninstalledItemsToShow) {
+      // If no installed results, automatically show library results with a message
+      if (shouldShowLibraryResults) {
+        // Force uninstalled items to be visible
+        if (!showUninstalledItems) {
+          setShowUninstalledItems(true);
+        }
+        
+        return (
+          <>
+            <Text className={styles.categoryTitle}>Library results</Text>
+            <div className={styles.categoryContainer}>
+              {Object.entries(groupedUninstalledActions).map(([moduleId, actions]) => {
+                // Get module info if available
+                const moduleInfo = dataService.getModuleById(moduleId) || 
+                                dataService.getConnectorById(moduleId);
+                
+                // Skip modules that don't match the active tab filter
+                if ((activeTab === 'Built-in' && isConnector(moduleId)) || 
+                    (activeTab === 'Connectors' && !isConnector(moduleId))) {
+                  return null;
+                }
+                
+                return (
+                  <div 
+                    key={moduleId} 
+                    className={styles.uninstalledModule}
+                    onClick={() => handleUninstalledItemClick(moduleId)}
+                  >
+                    <div className={styles.moduleHeader}>
+                      {moduleInfo?.icon && (
+                        <span className={`${styles.groupIcon} ${getIconBackgroundClass(moduleInfo.iconColor)} ${getIconColorClass(moduleInfo.iconColor)}`}>
+                          {isConnector(moduleId) 
+                            ? createConnectorImageElement(moduleId)
+                            : getIconByName(moduleInfo.icon, moduleId)
+                          }
+                        </span>
+                      )}
+                      <Text className={styles.moduleTitle}>{moduleInfo?.title || `Module ${moduleId}`}</Text>
+                    </div>
+                    <ArrowUpRight16Regular />
+                  </div>
+                );
+              }).filter(Boolean)}
+            </div>
+          </>
+        );
+      }
+      
+      // Otherwise show toggle as usual
       const toggleText = showUninstalledItems ? 'Hide library results' : `${filteredUninstalledCount} more results in the library`;
       
       return (
