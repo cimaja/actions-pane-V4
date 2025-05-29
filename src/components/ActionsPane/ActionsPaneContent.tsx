@@ -9,16 +9,28 @@ import {
   tokens,
   Divider,
   Button,
+  mergeClasses,
 } from '@fluentui/react-components';
-import { Star24Regular, Search24Regular } from '@fluentui/react-icons';
+import { Star24Regular, Search24Regular, ChevronDown16Regular, ChevronRight16Regular, ChevronUp16Regular, ArrowUpRight16Regular } from '@fluentui/react-icons';
 import { EmptyState } from '../common/EmptyState';
-import { getIconByName } from '../../utils/iconUtils';
+import { getIconByName, isConnector } from '../../utils/iconUtils';
+import { createConnectorImageElement } from '../../utils/connectorImageUtils';
 import { getIconColorClass, getIconBackgroundClass } from '../../utils/iconColorUtils';
 import { ActionItem } from './ActionItem';
-import { TabType, ActionGroup } from '../../models/types';
+import { TabType, ActionGroup, ActionItemType, DetailedActionItem } from '../../models/types';
 import { SortOrder } from './ActionsPaneHeader';
 import { dataService } from '../../data/dataService';
 import { openLibraryWithCategory } from './LibraryEntryPoint';
+
+// Define interfaces for uninstalled items
+interface UninstalledAction {
+  id: string;
+  title: string;
+  icon?: string;
+  iconColor?: string;
+  moduleId: string;
+  description?: string;
+}
 
 const useStyles = makeStyles({
   expandableGroup: {
@@ -226,6 +238,96 @@ const useStyles = makeStyles({
     fontWeight: tokens.fontWeightSemibold,
     color: tokens.colorBrandForeground2,
   },
+  
+  // Uninstalled items styles
+  uninstalledToggle: {
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+    color: tokens.colorBrandForeground1,
+    marginTop: tokens.spacingVerticalXL,
+    marginBottom: tokens.spacingVerticalXS,
+    paddingTop: tokens.spacingVerticalM,
+    '&:hover': {
+      textDecoration: 'underline',
+    },
+  },
+  uninstalledCount: {
+    color: tokens.colorNeutralForeground2,
+  },
+  uninstalledSection: {
+    marginTop: tokens.spacingVerticalXS,
+  },
+  uninstalledHeader: {
+    padding: '0',
+    marginTop: tokens.spacingVerticalXXS,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    height: '32px',
+  },
+  uninstalledContainer: {
+    backgroundColor: tokens.colorNeutralBackground1,
+    borderRadius: '8px',
+    padding: '8px',
+    marginBottom: tokens.spacingVerticalS,
+  },
+  sectionTitle: {
+    fontSize: '14px',
+    fontWeight: tokens.fontWeightSemibold,
+    color: '#242424',
+    lineHeight: '1.43',
+  },
+  uninstalledModule: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: `${tokens.spacingVerticalS} ${tokens.spacingHorizontalS}`,
+    borderRadius: '8px',
+    cursor: 'pointer',
+    '&:hover': {
+      backgroundColor: tokens.colorNeutralBackground1Hover,
+    },
+  },
+  moduleHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    flex: 1,
+  },
+  moduleIcon: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '24px',
+    height: '24px',
+    borderRadius: '8px',
+    '& svg': {
+      width: '16px',
+      height: '16px',
+    },
+  },
+  moduleTitle: {
+    fontSize: tokens.fontSizeBase300,
+    fontWeight: tokens.fontWeightSemibold,
+    color: tokens.colorNeutralForeground1,
+  },
+  uninstalledActions: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: tokens.spacingVerticalS,
+    marginTop: tokens.spacingVerticalXS,
+  },
+  uninstalledAction: {
+    fontSize: tokens.fontSizeBase200,
+    color: tokens.colorNeutralForeground2,
+  },
+  moreActions: {
+    fontSize: tokens.fontSizeBase200,
+    color: tokens.colorNeutralForeground3,
+    fontStyle: 'italic',
+  },
 }); 
 
 interface ActionsPaneContentProps {
@@ -233,6 +335,8 @@ interface ActionsPaneContentProps {
   searchQuery: string;
   sortOrder: SortOrder;
   setActiveTab: (tab: string) => void;
+  favoriteItems?: Record<string, boolean>;
+  onFavoriteChange?: (itemId: string, isFavorite: boolean) => void;
 }
 
 export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
@@ -240,29 +344,32 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
   searchQuery,
   sortOrder,
   setActiveTab,
+  favoriteItems = {},
+  onFavoriteChange,
 }) => {
   const styles = useStyles();
   // Initialize all groups as collapsed by default
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
-  // Track favorited items
-  const [favoriteItems, setFavoriteItems] = useState<Record<string, boolean>>({});
+  // State for uninstalled items
+  const [showUninstalledItems, setShowUninstalledItems] = useState<boolean>(false);
 
   // Get filtered groups from the data service and apply sorting
-  const filteredGroups = useMemo(() => {
-    const groups = dataService.getActionsPaneContent(
+  // Make sure to recalculate when activeTab changes
+  const { modules: filteredGroups, uninstalledCount: totalUninstalledCount } = useMemo<{ modules: ActionGroup[], uninstalledCount?: number }>(() => {
+    const result = dataService.getActionsPaneContent(
       activeTab as TabType,
       searchQuery,
       favoriteItems
     );
-
+    
     // Always make a copy of the array to avoid mutating the original
-    const sortedGroups = [...groups];
+    const sortedGroups: ActionGroup[] = [...result.modules];
 
     // Apply sorting based on sortOrder
     switch (sortOrder) {
       case 'category':
         if (['All', 'Built-in', 'Connectors'].includes(activeTab)) {
-          return sortedGroups.sort((a, b) => {
+          sortedGroups.sort((a: ActionGroup, b: ActionGroup) => {
             // Use the category field, falling back to tags for backward compatibility
             const categoryA = a.category || a.tags?.[0] || 'Other';
             const categoryB = b.category || b.tags?.[0] || 'Other';
@@ -279,19 +386,21 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
         break;
       
       case 'name-asc':
-        return sortedGroups.sort((a, b) => a.title.localeCompare(b.title));
+        sortedGroups.sort((a: ActionGroup, b: ActionGroup) => a.title.localeCompare(b.title));
+        break;
       
       case 'name-desc':
-        return sortedGroups.sort((a, b) => b.title.localeCompare(a.title));
+        sortedGroups.sort((a: ActionGroup, b: ActionGroup) => b.title.localeCompare(a.title));
+        break;
       
       case 'recent':
       default:
-        // Default to the order returned by the data service
+        // No sorting needed for recent, as it's the default order
         break;
     }
-    
-    return sortedGroups;
-  }, [activeTab, searchQuery, favoriteItems, sortOrder]);
+
+    return { modules: sortedGroups, uninstalledCount: result.uninstalledCount };
+  }, [activeTab, searchQuery, sortOrder, favoriteItems]);
 
   // Toggle group expansion
   const toggleGroup = (groupId: string) => {
@@ -300,11 +409,102 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
       [groupId]: !prev[groupId]
     }));
   };
+  
+  // Toggle uninstalled items visibility
+  const toggleUninstalledItems = (): void => {
+    setShowUninstalledItems(prev => !prev);
+    
+    // If we're showing uninstalled items, force a refresh of the data
+    if (!showUninstalledItems && searchQuery && totalUninstalledCount && totalUninstalledCount > 0) {
+      // This will trigger the uninstalledActions useMemo to recalculate
+      dataService.searchUninstalledActions(searchQuery);
+    }
+  };
+
+  // Handle clicking on an uninstalled item
+  const handleUninstalledItemClick = (moduleId: string): void => {
+    // Open the library with the appropriate category
+    openLibraryWithCategory(moduleId);
+  };
 
   // Filter to only show installed modules
   const installedGroups = useMemo(() => {
-    return filteredGroups.filter(group => group.isInstalled !== false);
+    return filteredGroups.filter((group: ActionGroup) => group.isInstalled !== false);
   }, [filteredGroups]);
+  
+  // Get uninstalled actions when showing them and there's a search query
+  // This needs to run even before the toggle is clicked to get an accurate count
+  const uninstalledActions = useMemo((): DetailedActionItem[] => {
+    if (searchQuery && totalUninstalledCount && totalUninstalledCount > 0) {
+      const actions = dataService.searchUninstalledActions(searchQuery);
+      
+      // Filter actions based on active tab
+      if (activeTab === 'Built-in') {
+        return actions.filter(action => !isConnector(action.moduleId));
+      } else if (activeTab === 'Connectors') {
+        return actions.filter(action => isConnector(action.moduleId));
+      }
+      
+      return actions;
+    }
+    return [];
+  }, [searchQuery, totalUninstalledCount, activeTab]);
+  
+  // Calculate filtered uninstalled count based on active tab
+  // Force recalculation when activeTab changes
+  const filteredUninstalledCount = useMemo((): number => {
+    if (!totalUninstalledCount) return 0;
+    if (activeTab === 'Favorites') return 0;
+    
+    // If we have actual uninstalled actions, count the unique modules
+    if (uninstalledActions.length > 0) {
+      // Get unique module IDs from the uninstalled actions
+      const uniqueModuleIds = new Set<string>();
+      uninstalledActions.forEach(action => uniqueModuleIds.add(action.moduleId));
+      return uniqueModuleIds.size;
+    }
+    
+    // If we don't have the actual modules yet, make an estimate based on total count
+    // This is just an approximation until the actual modules are loaded
+    if (activeTab === 'Built-in') {
+      // For Built-in tab, estimate that about 40% of uninstalled items are non-connectors
+      return Math.ceil(totalUninstalledCount * 0.4);
+    } else if (activeTab === 'Connectors') {
+      // For Connectors tab, estimate that about 60% of uninstalled items are connectors
+      return Math.ceil(totalUninstalledCount * 0.6);
+    }
+    
+    return totalUninstalledCount;
+  }, [totalUninstalledCount, activeTab, uninstalledActions]);
+  
+
+
+  // Group uninstalled actions by module
+  const groupedUninstalledActions = useMemo(() => {
+    if (!uninstalledActions || uninstalledActions.length === 0) return {};
+    
+    // Don't show uninstalled items if we're in Favorites tab and there's no search query
+    if (activeTab === 'Favorites' && !searchQuery) return {};
+    
+    const groupedByModule: { [key: string]: UninstalledAction[] } = {};
+    
+    uninstalledActions.forEach((action) => {
+      if (!groupedByModule[action.moduleId]) {
+        groupedByModule[action.moduleId] = [];
+      }
+      
+      groupedByModule[action.moduleId].push({
+        id: action.id,
+        title: action.title,
+        icon: action.icon,
+        iconColor: action.icon ? getIconColorClass(action.icon) : undefined,
+        moduleId: action.moduleId,
+        description: action.description
+      });
+    });
+    
+    return groupedByModule;
+  }, [uninstalledActions, activeTab, searchQuery]);
 
   // Group items by category when sorting by category
   const groupedByCategory = useMemo(() => {
@@ -320,7 +520,7 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
 
     const categoryGroups: Record<string, ActionGroup[]> = {};
     
-    installedGroups.forEach(group => {
+    installedGroups.forEach((group: ActionGroup) => {
       // Use the category field, falling back to tags for backward compatibility
       const category = group.category || group.tags?.[0] || 'Other';
       if (!categoryGroups[category]) {
@@ -332,14 +532,14 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
     // Convert to array and sort categories alphabetically
     return Object.entries(categoryGroups)
       .sort(([categoryA], [categoryB]) => categoryA.localeCompare(categoryB))
-      .map(([category, groups]) => ({
+      .map(([category, categoryGroups]) => ({
         category,
-        groups
+        groups: categoryGroups
       }));
   }, [installedGroups, sortOrder, activeTab]);
 
   // Render a group with its items and subgroups
-  const renderGroup = (group: ActionGroup) => {
+  const renderGroup = (group: ActionGroup): JSX.Element => {
     const isExpanded = expandedGroups[group.id] === true;
 
     return (
@@ -370,10 +570,8 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
                     <ActionItem 
                       item={{...item, isFavorite: !!favoriteItems[item.id]}}
                       onFavoriteChange={(itemId, isFavorite) => {
-                        setFavoriteItems(prev => ({
-                          ...prev,
-                          [itemId]: isFavorite
-                        }));
+                        onFavoriteChange && onFavoriteChange(itemId, isFavorite);
+
                       }} 
                     />
                   </div>
@@ -395,12 +593,7 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
                           <div key={item.id} className={styles.actionItem}>
                             <ActionItem 
                               item={{...item, isFavorite: !!favoriteItems[item.id]}}
-                              onFavoriteChange={(itemId, isFavorite) => {
-                                setFavoriteItems(prev => ({
-                                  ...prev,
-                                  [itemId]: isFavorite
-                                }));
-                              }} 
+                              onFavoriteChange={onFavoriteChange || (() => {})} 
                             />
                           </div>
                         ))}
@@ -416,8 +609,51 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
     );
   };
 
+  // Render uninstalled items section
+  const renderUninstalledItems = (): JSX.Element | null => {
+    if (!showUninstalledItems || !filteredUninstalledCount || filteredUninstalledCount <= 0) {
+      return null;
+    }
+    
+    return (
+      <div className={styles.uninstalledSection}>
+        
+        <div className={styles.uninstalledContainer}>
+          {Object.entries(groupedUninstalledActions).map(([moduleId, actions]) => {
+            // Get module info if available
+            const moduleInfo = dataService.getModuleById(moduleId) || 
+                            dataService.getConnectorById(moduleId);
+            
+            return (
+              <div 
+                key={moduleId} 
+                className={styles.uninstalledModule}
+                onClick={() => handleUninstalledItemClick(moduleId)}
+              >
+                <div className={styles.moduleHeader}>
+                  {moduleInfo?.icon && (
+                    <div className={mergeClasses(
+                      styles.moduleIcon,
+                      getIconBackgroundClass(moduleInfo.iconColor || '')
+                    )}>
+                      {isConnector(moduleId) 
+                        ? createConnectorImageElement(moduleId)
+                        : getIconByName(moduleInfo.icon)}
+                    </div>
+                  )}
+                  <Text className={styles.moduleTitle}>{moduleInfo?.title || `Module ${moduleId}`}</Text>
+                </div>
+                <ArrowUpRight16Regular />
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+  
   // Render empty state if no groups found
-  if (installedGroups.length === 0) {
+  if (installedGroups.length === 0 && (!searchQuery || !filteredUninstalledCount)) {
     return (
       <div className={styles.emptyState}>
         {activeTab === 'Favorites' ? (
@@ -486,6 +722,65 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
   const containerClasses = `${styles.container}${isEmptyState ? ' empty' : ''}`;
 
   const renderContent = () => {
+    // If there's a search query and uninstalled items, show toggle
+    if (searchQuery && filteredUninstalledCount && filteredUninstalledCount > 0) {
+      const toggleText = showUninstalledItems ? 'Hide library results' : `${filteredUninstalledCount} more results in the library`;
+      
+      return (
+        <>
+          {/* Render by category if grouped */}
+          {groupedByCategory ? (
+            <>
+              {groupedByCategory.map(({ category, groups }) => (
+                <React.Fragment key={category}>
+                  <div className={styles.categoryHeader}>
+                    <Text className={styles.categoryTitle}>
+                      {category === 'connector' ? 'Connectors' : category}
+                    </Text>
+                    <Text 
+                      className={styles.seeAllLink} 
+                      onClick={() => {
+                        // Map the category to a valid category string
+                        let libraryCategory = 'Built-in';
+                        
+                        if (category === 'connector' || category === 'Connectors') {
+                          libraryCategory = 'Connectors';
+                        } else if (category === 'Data' || category === 'Integration') {
+                          libraryCategory = 'Built-in';
+                        }
+                        
+                        // Open library with the selected category
+                        openLibraryWithCategory(libraryCategory);
+                      }}
+                    >
+                      See all
+                    </Text>
+                  </div>
+                  <div className={styles.categoryContainer}>
+                    {groups.map(group => renderGroup(group))}
+                  </div>
+                </React.Fragment>
+              ))}
+            </>
+          ) : (
+            // Render without categories
+            <>
+              {installedGroups.map((group: ActionGroup) => renderGroup(group))}
+            </>
+          )}
+          
+          {/* Show uninstalled actions toggle - moved below the list of results */}
+          <div className={styles.uninstalledToggle} onClick={toggleUninstalledItems}>
+            {toggleText}
+            {showUninstalledItems ? <ChevronUp16Regular /> : <ChevronDown16Regular />}
+          </div>
+          
+          {/* Render uninstalled items if toggle is on */}
+          {renderUninstalledItems()}
+        </>
+      );
+    }
+    
     if (isEmptyState) {
       return (
         <div className={styles.emptyState}>
@@ -592,7 +887,7 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
     }
 
     // Render groups without category headers
-    return installedGroups.map(group => renderGroup(group));
+    return installedGroups.map((group: ActionGroup) => renderGroup(group));
   };
 
   return <div className={containerClasses}>{renderContent()}</div>;
