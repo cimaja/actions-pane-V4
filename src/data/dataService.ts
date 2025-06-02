@@ -23,22 +23,31 @@ export class DataService {
    */
   private initializeData(): void {
     // Initialize modules
-    this._modules = Object.values(moduleFiles).map(moduleFile => moduleFile.module);
-    
-    // Initialize connectors
-    this._connectors = Object.values(connectorFiles).map(connectorFile => connectorFile.connector);
-    
-    // Initialize actions from modules
-    this._moduleActions = Object.values(moduleFiles).flatMap(moduleFile => 
-      moduleFile.getAllActions().map((action: ActionItemType) => ({
+    this._modules = Object.values(moduleFiles).map(moduleFile => ({
+      ...moduleFile.module,
+      actions: moduleFile.getAllActions ? moduleFile.getAllActions().map((action: ActionItemType) => ({
         ...action,
         moduleId: moduleFile.module.id
-      }))
+      })) : []
+    }));
+    
+    // Initialize connectors and their actions
+    this._connectors = Object.values(connectorFiles).map(connectorFile => ({
+      ...connectorFile.connector,
+      actions: connectorFile.actions || []
+    }));
+    
+    // Initialize actions from modules (for backward compatibility)
+    this._moduleActions = Object.values(moduleFiles).flatMap(moduleFile => 
+      moduleFile.getAllActions ? moduleFile.getAllActions().map((action: ActionItemType) => ({
+        ...action,
+        moduleId: moduleFile.module.id
+      })) : []
     );
     
-    // Initialize actions from connectors
+    // Initialize actions from connectors (for backward compatibility)
     this._connectorActions = Object.values(connectorFiles).flatMap(connectorFile => 
-      connectorFile.actions
+      connectorFile.actions || []
     );
   }
 
@@ -81,11 +90,26 @@ export class DataService {
   
   /**
    * Search modules by query
+   * @param query The search query
+   * @param installedOnly Whether to only include installed modules
    */
-  searchModules(query: string): ActionGroup[] {
+  searchModules(query: string, installedOnly: boolean = true): ActionGroup[] {
     const normalizedQuery = query.toLowerCase();
     return this._modules.filter(module => 
-      module.title.toLowerCase().includes(normalizedQuery)
+      module.title.toLowerCase().includes(normalizedQuery) &&
+      (!installedOnly || module.isInstalled !== false)
+    );
+  }
+
+  /**
+   * Search for uninstalled modules by query
+   * @param query The search query
+   */
+  searchUninstalledModules(query: string): ActionGroup[] {
+    const normalizedQuery = query.toLowerCase();
+    return this._modules.filter(module => 
+      module.title.toLowerCase().includes(normalizedQuery) &&
+      module.isInstalled === false
     );
   }
   
@@ -105,13 +129,45 @@ export class DataService {
   
   /**
    * Search actions by query
+   * @param query The search query
+   * @param installedOnly Whether to only include actions from installed modules
    */
-  searchActions(query: string): DetailedActionItem[] {
+  searchActions(query: string, installedOnly: boolean = true): DetailedActionItem[] {
     const normalizedQuery = query.toLowerCase();
-    return [...this._moduleActions, ...this._connectorActions].filter(action => 
-      action.title.toLowerCase().includes(normalizedQuery) || 
-      (action.description && action.description.toLowerCase().includes(normalizedQuery))
-    );
+    return [...this._moduleActions, ...this._connectorActions].filter(action => {
+      const matchesQuery = action.title.toLowerCase().includes(normalizedQuery) || 
+        (action.description && action.description.toLowerCase().includes(normalizedQuery));
+      
+      if (!matchesQuery) return false;
+      
+      if (installedOnly) {
+        // Check if the action's module is installed
+        const module = this.getModuleById(action.moduleId);
+        const connector = this.getConnectorById(action.moduleId);
+        return (module && module.isInstalled !== false) || (connector && connector.isInstalled);
+      }
+      
+      return true;
+    });
+  }
+
+  /**
+   * Search for uninstalled actions by query
+   * @param query The search query
+   */
+  searchUninstalledActions(query: string): DetailedActionItem[] {
+    const normalizedQuery = query.toLowerCase();
+    return [...this._moduleActions, ...this._connectorActions].filter(action => {
+      const matchesQuery = action.title.toLowerCase().includes(normalizedQuery) || 
+        (action.description && action.description.toLowerCase().includes(normalizedQuery));
+      
+      if (!matchesQuery) return false;
+      
+      // Check if the action's module is not installed
+      const module = this.getModuleById(action.moduleId);
+      const connector = this.getConnectorById(action.moduleId);
+      return (module && module.isInstalled === false) || (connector && !connector.isInstalled);
+    });
   }
   
   /**
@@ -206,7 +262,10 @@ export class DataService {
           actions: module.items
         }));
       case 'Connectors':
-        return this.getAllConnectors();
+        return this.getAllConnectors().map(connector => ({
+          ...connector,
+          actions: this._connectorActions.filter(action => action.moduleId === connector.id)
+        }));
       case 'Custom Actions':
         return []; // To be implemented
       case 'UI Collections':
@@ -241,7 +300,7 @@ export class DataService {
   /**
    * Get content for the Actions Pane based on active tab, search query, and favorites
    */
-  getActionsPaneContent(activeTab: TabType, searchQuery: string, favoriteItems: Record<string, boolean> = {}): ActionGroup[] {
+  getActionsPaneContent(activeTab: TabType, searchQuery: string, favoriteItems: Record<string, boolean> = {}): { modules: ActionGroup[], uninstalledCount?: number } {
     if (activeTab === 'Favorites') {
       const favoriteActions = this.getFavoriteActions(favoriteItems);
       
@@ -255,7 +314,7 @@ export class DataService {
       });
       
       // Create ActionGroup objects for each module with favorites
-      return Object.entries(groupedFavorites).map(([moduleId, items]) => {
+      const modules = Object.entries(groupedFavorites).map(([moduleId, items]) => {
         // Look for module or connector to get proper title and icon
         const module = this.getModuleById(moduleId);
         const connector = this.getConnectorById(moduleId);
@@ -283,6 +342,8 @@ export class DataService {
         
         return actionGroup;
       });
+      
+      return { modules };
     }
     
     // Filter modules based on tab
@@ -379,7 +440,21 @@ export class DataService {
       }).filter(Boolean) as ActionGroup[]; // Filter out null values and cast back to ActionGroup[]
     }
     
-    return modules;
+    // If there's a search query, count uninstalled items that match
+    let uninstalledCount;
+    if (searchQuery) {
+      const uninstalledModules = this.searchUninstalledModules(searchQuery);
+      const uninstalledActions = this.searchUninstalledActions(searchQuery);
+      
+      // Count unique modules/connectors that have matching uninstalled actions
+      const uniqueModuleIds = new Set<string>();
+      uninstalledActions.forEach(action => uniqueModuleIds.add(action.moduleId));
+      uninstalledModules.forEach(module => uniqueModuleIds.add(module.id));
+      
+      uninstalledCount = uniqueModuleIds.size;
+    }
+    
+    return { modules, uninstalledCount };
   }
 }
 

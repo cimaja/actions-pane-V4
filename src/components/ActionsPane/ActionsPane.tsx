@@ -122,6 +122,7 @@ export const ActionsPane: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortOrder, setSortOrder] = useState<SortOrder>('category');
+  const [favoriteItems, setFavoriteItems] = useState<Record<string, boolean>>({});
   const [width, setWidth] = useState<number>(getSavedWidth());
   const [isResizing, setIsResizing] = useState<boolean>(false);
   const [isAtMinWidth, setIsAtMinWidth] = useState<boolean>(width <= MIN_WIDTH);
@@ -238,6 +239,13 @@ export const ActionsPane: React.FC = () => {
           searchQuery={searchQuery}
           sortOrder={sortOrder}
           setActiveTab={setActiveTab}
+          favoriteItems={favoriteItems}
+          onFavoriteChange={(itemId, isFavorite) => {
+            setFavoriteItems(prev => ({
+              ...prev,
+              [itemId]: isFavorite
+            }));
+          }}
         />
       </div>
       <div className={styles.footer}>

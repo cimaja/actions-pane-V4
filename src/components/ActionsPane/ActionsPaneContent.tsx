@@ -21,6 +21,7 @@ import { TabType, ActionGroup, ActionItemType, DetailedActionItem } from '../../
 import { SortOrder } from './ActionsPaneHeader';
 import { dataService } from '../../data/dataService';
 import { openLibraryWithCategory } from './LibraryEntryPoint';
+import { LibraryModal } from '../Library/LibraryModal';
 
 // Define interfaces for uninstalled items
 interface UninstalledAction {
@@ -352,6 +353,15 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
   // State for uninstalled items
   const [showUninstalledItems, setShowUninstalledItems] = useState<boolean>(false);
+  
+  // State for library dialog props
+  const [libraryDialogProps, setLibraryDialogProps] = useState<{
+    open: boolean;
+    initialCategory?: string;
+    initialItemId?: string;
+  }>({
+    open: false
+  });
 
   // Get filtered groups from the data service and apply sorting
   // Make sure to recalculate when activeTab changes
@@ -973,5 +983,17 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
     return installedGroups.map((group: ActionGroup) => renderGroup(group));
   };
 
-  return <div className={containerClasses}>{renderContent()}</div>;
+  return (
+    <>
+      <div className={containerClasses}>{renderContent()}</div>
+      
+      {/* Library Modal */}
+      <LibraryModal 
+        open={libraryDialogProps.open}
+        onOpenChange={(open) => setLibraryDialogProps({...libraryDialogProps, open})}
+        initialCategory={libraryDialogProps.initialCategory}
+        initialItemId={libraryDialogProps.initialItemId}
+      />
+    </>
+  );
 };

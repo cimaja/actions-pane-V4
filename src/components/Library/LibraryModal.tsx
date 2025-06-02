@@ -13,13 +13,14 @@ import {
   SearchBox,
   tokens,
   Dropdown,
-  Option
+  Option,
+  Badge
 } from '@fluentui/react-components';
 
 import { 
   Dismiss24Regular, 
   Search24Regular, 
-  CheckmarkCircle24Filled,
+  Checkmark12Regular,
   Beaker24Regular,
   DocumentData24Regular,
   ArrowDownload24Regular,
@@ -61,7 +62,8 @@ import {
   Desktop24Regular,
   Settings24Regular,
   ScanText24Regular,
-  TextDescription24Regular
+  TextDescription24Regular,
+  ChevronRight24Regular
 } from '@fluentui/react-icons';
 import { dataService } from '../../data/dataService';
 import { LibraryItemType, LibraryCategoryType } from '../../models/types';
@@ -92,18 +94,190 @@ const useStyles = makeStyles({
   dialogSurface: {
     width: '80vw',
     height: '80vh',
-    maxWidth: '1200px',
-    maxHeight: '800px',
+    maxWidth: '1000px',
+    maxHeight: '700px',
     padding: 0,
     display: 'flex',
     flexDirection: 'column',
+    overflow: 'hidden',
     '@media (max-width: 768px)': {
       width: '90vw',
+      maxHeight: '80vh',
     },
     '@media (max-width: 480px)': {
       width: '95vw',
       height: '90vh',
     },
+  },
+  listView: {
+    display: 'flex',
+    flexDirection: 'column',
+    width: '100%',
+    height: '100%',
+  },
+  // Details view styles
+  detailsView: {
+    display: 'flex',
+    flexDirection: 'column',
+    width: '100%',
+    height: '100%',
+    padding: '16px',
+    boxSizing: 'border-box',
+    overflowX: 'hidden',
+    overflowY: 'auto',
+    marginRight: '16px', // Added right margin
+  },
+  detailsHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    marginBottom: '16px',
+  },
+  detailsContent: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '20px',
+    padding: '0 0 16px 16px', // Remove right padding since we're adding it to detailsActions
+    overflowY: 'auto',
+    overflowX: 'hidden',
+    width: '100%',
+    maxWidth: '100%',
+    boxSizing: 'border-box',
+    '@media (max-width: 768px)': {
+      gap: '16px',
+      padding: '0 0 12px 12px', // Remove right padding since we're adding it to detailsActions
+    },
+  },
+  detailsMainRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    paddingRight: '16px',
+    boxSizing: 'border-box',
+    marginBottom: '24px',
+    '@media (max-width: 768px)': {
+      flexDirection: 'column',
+      alignItems: 'center',
+      textAlign: 'center',
+      gap: '16px',
+    },
+  },
+  detailsLeftContent: {
+    display: 'flex',
+    gap: '16px',
+    alignItems: 'center',
+    flex: '1 1 auto',
+    '@media (max-width: 768px)': {
+      flexDirection: 'column',
+      alignItems: 'center',
+    },
+  },
+  detailsTextContent: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+    '@media (max-width: 768px)': {
+      alignItems: 'center',
+    },
+  },
+  detailsRightCTA: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    '@media (max-width: 768px)': {
+      width: '100%',
+      justifyContent: 'center',
+    },
+  },
+  detailsTitle: {
+    margin: 0,
+    lineHeight: 1,
+  },
+  detailsIcon: {
+    width: '64px',
+    height: '64px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: '8px',
+    '& svg': {
+      width: '40px',
+      height: '40px',
+    },
+  },
+  detailsInfo: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '16px',
+    flex: 1,
+    maxWidth: '100%',
+  },
+  detailsCategory: {
+    color: '#323130 !important', // Exact Grey 110
+    marginTop: 0,
+    lineHeight: 1,
+    fontSize: tokens.fontSizeBase300,
+    fontWeight: tokens.fontWeightRegular,
+  },
+  detailsActions: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 0,
+    width: '100%',
+    paddingRight: '16px',
+    boxSizing: 'border-box',
+  },
+  actionsHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: '12px 16px',
+    backgroundColor: tokens.colorNeutralBackground1,
+    border: `1px solid ${tokens.colorNeutralStroke2}`,
+    borderBottom: `1px solid ${tokens.colorNeutralStroke2}`,
+    borderTopLeftRadius: tokens.borderRadiusMedium,
+    borderTopRightRadius: tokens.borderRadiusMedium,
+    margin: 0,
+  },
+  actionsDetailList: {
+    display: 'flex',
+    flexDirection: 'column',
+    width: '100%',
+    boxSizing: 'border-box',
+    border: `1px solid ${tokens.colorNeutralStroke2}`,
+    borderTop: 'none',
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+    borderBottomLeftRadius: tokens.borderRadiusMedium,
+    borderBottomRightRadius: tokens.borderRadiusMedium,
+    overflow: 'hidden',
+  },
+  actionListItem: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '16px',
+    transition: 'all 0.2s ease',
+    borderBottom: `1px solid ${tokens.colorNeutralStroke2}`,
+    cursor: 'pointer',
+    backgroundColor: tokens.colorNeutralBackground1,
+    '&:hover': {
+      backgroundColor: tokens.colorNeutralBackground2,
+    },
+    '&:active': {
+      backgroundColor: tokens.colorNeutralBackground3,
+    },
+    '&:last-child': {
+      borderBottom: 'none',
+      borderBottomLeftRadius: tokens.borderRadiusMedium,
+      borderBottomRightRadius: tokens.borderRadiusMedium,
+    },
+  },
+  actionListItemContent: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '4px',
+    flex: 1,
+    overflow: 'hidden',
   },
   header: {
     display: 'flex',
@@ -256,8 +430,12 @@ const useStyles = makeStyles({
   },
   itemsList: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-    gap: tokens.spacingHorizontalL,
+    gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+    gap: tokens.spacingHorizontalM,
+    '@media (max-width: 768px)': {
+      gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+      gap: tokens.spacingHorizontalS,
+    },
   },
   card: {
     height: '100%',
@@ -265,10 +443,11 @@ const useStyles = makeStyles({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    gap: '12px',
-    padding: '8px 12px',
-    marginTop: '8px',
+    gap: '8px',
+    padding: '8px 8px',
+    marginTop: '4px',
     boxShadow: tokens.shadow2,
+    overflow: 'hidden', // Prevent content overflow
     '&:hover': {
       boxShadow: tokens.shadow4,
       transform: 'translateY(-1px)',
@@ -288,26 +467,23 @@ const useStyles = makeStyles({
   cardContent: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '2px',
-    flex: 1,
+    justifyContent: 'center',
+    gap: 0,
+    overflow: 'hidden',
+    width: '100%',
+  },
+  cardTitle: {
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    fontWeight: tokens.fontWeightSemibold,
   },
   cardFooter: {
     display: 'flex',
     justifyContent: 'flex-end',
     alignItems: 'center',
   },
-  installedBadge: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: '4px',
-    padding: '0px 4px',
-    height: '20px',
-    borderRadius: '9999px',
-    backgroundColor: tokens.colorPaletteGreenBackground1,
-    color: tokens.colorPaletteGreenForeground1,
-    fontSize: tokens.fontSizeBase200,
-  },
+
   connectorIcon: {
     width: '64px',
     height: '64px',
@@ -320,15 +496,7 @@ const useStyles = makeStyles({
   actionButton: {
     minWidth: '100px',
   },
-  footer: {
-    borderTop: `1px solid ${tokens.colorNeutralStroke2}`,
-    padding: `${tokens.spacingVerticalM} ${tokens.spacingHorizontalL}`,
-    display: 'flex',
-    justifyContent: 'flex-end',
-    gap: tokens.spacingHorizontalM,
-    width: '100%',
-    boxSizing: 'border-box',
-  },
+
   description: {
     color: tokens.colorNeutralForeground2,
     fontSize: tokens.fontSizeBase200,
@@ -336,8 +504,9 @@ const useStyles = makeStyles({
   category: {
     color: tokens.colorNeutralForeground2,
     fontSize: tokens.fontSizeBase200,
+    lineHeight: '16px',
     display: 'block',
-    marginTop: '2px',
+    marginTop: 0,
   },
   noResults: {
     display: 'flex',
@@ -370,22 +539,46 @@ interface LibraryModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   initialCategory?: string;
+  initialItemId?: string; // Added to support opening directly to a specific item
 }
 
-export const LibraryModal = ({ open, onOpenChange, initialCategory }: LibraryModalProps) => {
+export const LibraryModal: React.FC<LibraryModalProps> = ({ open, onOpenChange, initialCategory, initialItemId }) => {
   const styles = useStyles();
-  const [activeTab, setActiveTab] = useState<LibraryCategoryType>(initialCategory as LibraryCategoryType || 'Built-in');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sortType, setSortType] = useState<'name' | 'category'>('category');
+  const [activeTab, setActiveTab] = useState<LibraryCategoryType>('Built-in');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [sortType, setSortType] = useState<'name' | 'category'>('name');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [selectedItem, setSelectedItem] = useState<LibraryItemType | null>(null);
+  const [viewMode, setViewMode] = useState<'list' | 'details'>('list');
 
-  // Update activeTab when initialCategory changes
+  // Get all available library items
+  const getAllLibraryItems = (): LibraryItemType[] => {
+    let allItems: LibraryItemType[] = [];
+    ['Built-in', 'Connectors', 'Custom Actions', 'UI Collections', 'Templates'].forEach(category => {
+      allItems = [...allItems, ...dataService.getLibraryItemsByCategory(category as LibraryCategoryType)];
+    });
+    return allItems;
+  };
+  
+  // Set active tab based on initialCategory if provided
   useEffect(() => {
-    console.log('LibraryModal initialCategory:', initialCategory);
     if (initialCategory) {
-      console.log('Setting activeTab to:', initialCategory);
-      setActiveTab(initialCategory as LibraryCategoryType);
+      // Check if initialCategory is a valid LibraryCategoryType
+      if (['Built-in', 'Connectors', 'Custom Actions', 'UI Collections', 'Templates'].includes(initialCategory)) {
+        setActiveTab(initialCategory as LibraryCategoryType);
+      }
     }
-  }, [initialCategory]);
+    
+    // If initialItemId is provided, find the item and show details
+    if (initialItemId) {
+      const allItems = getAllLibraryItems();
+      const item = allItems.find(item => item.id === initialItemId);
+      if (item) {
+        setSelectedItem(item);
+        setViewMode('details');
+      }
+    }
+  }, [initialCategory, initialItemId]);
 
   // Helper function to get the category name for an item
   const getItemCategory = (item: LibraryItemType): string => {
@@ -466,37 +659,24 @@ export const LibraryModal = ({ open, onOpenChange, initialCategory }: LibraryMod
   // Helper function to get the icon for each category
   const getCategoryIcon = (category: LibraryCategoryType | string) => {
     const isActive = activeTab === category;
-    const iconStyle = {
-      width: '20px',
-      height: '20px',
-      color: isActive ? '#0078D4' : '#323130',
-      transition: 'color 0.2s ease',
-      fill: 'currentColor'
-    };
-
-    // Get the appropriate icon component (filled when active, regular when inactive)
+    const iconStyle = { color: isActive ? tokens.colorBrandForeground1 : tokens.colorNeutralForeground2 };
     let IconComponent;
+    
     switch (category) {
       case 'Built-in':
-        IconComponent = isActive ? Cube24Filled : Cube24Regular;
+        IconComponent = isActive ? PuzzlePiece24Filled : PuzzlePiece24Regular;
         break;
       case 'Connectors':
         IconComponent = isActive ? PlugConnected24Filled : PlugConnected24Regular;
         break;
       case 'Custom Actions':
-        IconComponent = isActive ? PuzzlePiece24Filled : PuzzlePiece24Regular;
-        break;
-      case 'UI Collections':
         IconComponent = isActive ? Shapes24Filled : Shapes24Regular;
         break;
-      case 'Templates':
+      case 'UI Collections':
         IconComponent = isActive ? Book24Filled : Book24Regular;
         break;
-      case 'Advanced':
-        IconComponent = isActive ? Star24Filled : Star24Regular;
-        break;
-      case 'Data':
-        IconComponent = isActive ? Database24Filled : Database24Regular;
+      case 'Templates':
+        IconComponent = isActive ? Cube24Filled : Cube24Regular;
         break;
       default:
         IconComponent = isActive ? Cube24Filled : Cube24Regular;
@@ -509,6 +689,123 @@ export const LibraryModal = ({ open, onOpenChange, initialCategory }: LibraryMod
     // This would be implemented to actually install the connector
     console.log(`Installing item with ID: ${itemId}`);
     // In a real implementation, this would call an API to install the item
+  };
+  
+  // Function to handle card click
+  const handleCardClick = (item: LibraryItemType) => {
+    setSelectedItem(item);
+    setViewMode('details');
+  };
+  
+  // Go back to the list view
+  const handleBackToList = () => {
+    setViewMode('list');
+    setSelectedItem(null);
+  };
+  
+  // Function to render the details view
+  
+  // Render the details view for a selected item
+  const renderDetailsView = () => {
+    if (!selectedItem) return null;
+    
+    // Get actions for this module
+    const actions = selectedItem.actions || [];
+    
+    return (
+      <div className={styles.detailsView}>
+        <div className={styles.detailsHeader}>
+          <Button 
+            appearance="subtle" 
+            icon={<ChevronRight24Regular style={{ transform: 'rotate(180deg)' }} />} 
+            onClick={handleBackToList}
+          >
+            Back to library
+          </Button>
+        </div>
+        
+        <div className={styles.detailsContent}>
+          {/* Main details row with left content and right CTA */}
+          <div className={styles.detailsMainRow}>
+            {/* Left side: Content */}
+            <div className={styles.detailsLeftContent}>
+              <div className={`${styles.detailsIcon} ${getIconBackgroundClass((selectedItem as ModuleItemType).iconColor)} ${getIconColorClass((selectedItem as ModuleItemType).iconColor)}`}>
+                {getIconByName(selectedItem.icon, selectedItem.id)}
+              </div>
+              
+              <div className={styles.detailsTextContent}>
+                <Text size={600} weight="semibold" className={styles.detailsTitle}>{selectedItem.title}</Text>
+                <Text 
+                  size={300}
+                  style={{
+                    color: tokens.colorNeutralForeground3,
+                    marginTop: 0,
+                    lineHeight: 1,
+                  }}
+                >
+                  {getItemCategory(selectedItem)}
+                </Text>
+              </div>
+            </div>
+            
+            {/* Right side: CTA button */}
+            <div className={styles.detailsRightCTA}>
+              {selectedItem.isInstalled ? (
+                <Button 
+                  appearance="secondary"
+                  onClick={() => {
+                    console.log('Uninstall module:', selectedItem.id);
+                    // Implement uninstall functionality
+                  }}
+                >
+                  Uninstall
+                </Button>
+              ) : (
+                <Button 
+                  appearance="primary"
+                  icon={<ArrowDownload24Regular />}
+                  onClick={() => {
+                    console.log('Install module:', selectedItem.id);
+                    handleInstall(selectedItem.id);
+                  }}
+                >
+                  Install module
+                </Button>
+              )}
+            </div>
+          </div>
+          
+          <div className={styles.detailsActions}>
+            
+            <div className={styles.actionsHeader}>
+              <Text size={300} weight="semibold">
+                {actions.length} action{actions.length !== 1 ? 's' : ''}
+              </Text>
+            </div>
+            
+            {actions.length > 0 ? (
+              <div className={styles.actionsDetailList}>
+                {actions.map(action => (
+                  <div key={action.id} className={styles.actionListItem} onClick={() => {
+                    console.log('Action selected:', action);
+                    // Handle action selection - add to canvas
+                  }}>
+                    <div className={styles.actionListItemContent}>
+                      <Text>{action.title}</Text>
+                      <Text size={200} style={{ color: tokens.colorNeutralForeground3 }}>
+                        Execute {action.description ? action.description.toLowerCase() : 'action'}
+                      </Text>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <Text>No actions available for this module.</Text>
+            )}
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -526,29 +823,34 @@ export const LibraryModal = ({ open, onOpenChange, initialCategory }: LibraryMod
         </div>
 
         <DialogContent className={styles.content} style={{ padding: 0 }}>
-          {/* Left Navigation */}
-          <div className={styles.navSidebar}>
-            {(['Built-in', 'Connectors', 'Custom Actions', 'UI Collections', 'Templates'] as LibraryCategoryType[]).map((category) => (
-              <div 
-                key={category} 
-                className={`${styles.navItem} ${activeTab === category ? 'selected' : ''}`}
-                onClick={() => setActiveTab(category)}
-              >
-                <div style={{ padding: '2px', display: 'flex', alignItems: 'center' }}>
-                  {getCategoryIcon(category)}
+          {/* Left Navigation - Only show in list view */}
+          {viewMode === 'list' && (
+            <div className={styles.navSidebar}>
+              {(['Built-in', 'Connectors', 'Custom Actions', 'UI Collections', 'Templates'] as LibraryCategoryType[]).map((category) => (
+                <div 
+                  key={category} 
+                  className={`${styles.navItem} ${activeTab === category ? 'selected' : ''}`}
+                  onClick={() => setActiveTab(category)}
+                >
+                  <div style={{ padding: '2px', display: 'flex', alignItems: 'center' }}>
+                    {getCategoryIcon(category)}
+                  </div>
+                  <span className={styles.navItemText}>{category}</span>
                 </div>
-                <span className={styles.navItemText}>{category}</span>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
           
           {/* Main Content */}
           <div className={styles.mainContent}>
+            {viewMode === 'details' ? (
+              renderDetailsView()
+            ) : (
+              <div className={styles.listView}>
             <div className={styles.itemsHeader}>
               <div className={styles.columnHeader}>
                 {/* Sort options - show more options for Built-in category */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Text size={200}>Sort by:</Text>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
                   {(activeTab === 'Built-in' || activeTab === 'Connectors') && (
                     <Dropdown
                       value={sortType === 'name' ? 'Name' : 'Category'}
@@ -658,6 +960,11 @@ export const LibraryModal = ({ open, onOpenChange, initialCategory }: LibraryMod
                         <Card
                           key={item.id}
                           className={styles.card}
+                          onClick={() => {
+                            setSelectedItem(item);
+                            setViewMode('details');
+                          }}
+                          style={{ cursor: 'pointer' }}
                         >
                           <div 
                             className={`${styles.cardIcon} ${getIconBackgroundClass((item as ModuleItemType).iconColor)} ${getIconColorClass((item as ModuleItemType).iconColor)}`}
@@ -665,7 +972,7 @@ export const LibraryModal = ({ open, onOpenChange, initialCategory }: LibraryMod
                             {getIconByName(item.icon, item.id)}
                           </div>
                           <div className={styles.cardContent}>
-                            <Text weight="regular">{item.title}</Text>
+                            <Text className={styles.cardTitle}>{item.title}</Text>
 
                             {/* Show category directly from the first tag */}
                             <Text className={styles.category}>
@@ -679,21 +986,16 @@ export const LibraryModal = ({ open, onOpenChange, initialCategory }: LibraryMod
                               })()}
                             </Text>
                           </div>
-                          <div className={styles.cardFooter}>
-                            {item.isInstalled ? (
-                              <div className={styles.installedBadge}>
-                                <CheckmarkCircle24Filled fontSize={12} />
-                              </div>
-                            ) : (
-                              <Button 
-                                appearance="transparent"
-                                icon={<ArrowDownload24Regular />}
+                          {item.isInstalled && (
+                            <div className={styles.cardFooter}>
+                              <Badge 
+                                appearance="tint"
+                                color="success"
+                                icon={<Checkmark12Regular />}
                                 size="small"
-                                onClick={() => handleInstall(item.id)}
-                                aria-label="Install"
                               />
-                            )}
-                          </div>
+                            </div>
+                          )}
                         </Card>
                       ))}
                     </div>
@@ -707,6 +1009,11 @@ export const LibraryModal = ({ open, onOpenChange, initialCategory }: LibraryMod
                       <Card
                         key={item.id}
                         className={styles.card}
+                        onClick={() => {
+                          setSelectedItem(item);
+                          setViewMode('details');
+                        }}
+                        style={{ cursor: 'pointer' }}
                       >
                         <div 
                           className={`${styles.cardIcon} ${getIconBackgroundClass((item as ModuleItemType).iconColor)} ${getIconColorClass((item as ModuleItemType).iconColor)}`}
@@ -714,27 +1021,22 @@ export const LibraryModal = ({ open, onOpenChange, initialCategory }: LibraryMod
                           {getIconByName(item.icon, item.id)}
                         </div>
                         <div className={styles.cardContent}>
-                          <Text weight="regular">{item.title}</Text>
+                          <Text className={styles.cardTitle}>{item.title}</Text>
 
                           <Text className={styles.category}>
                             {getItemCategory(item)}
                           </Text>
                         </div>
-                        <div className={styles.cardFooter}>
-                          {item.isInstalled ? (
-                            <div className={styles.installedBadge}>
-                              <CheckmarkCircle24Filled fontSize={12} />
-                            </div>
-                          ) : (
-                            <Button 
-                              appearance="transparent"
-                              icon={<ArrowDownload24Regular />}
+                        {item.isInstalled && (
+                          <div className={styles.cardFooter}>
+                            <Badge 
+                              appearance="tint"
+                              color="success"
+                              icon={<Checkmark12Regular />}
                               size="small"
-                              onClick={() => handleInstall(item.id)}
-                              aria-label="Install"
                             />
-                          )}
-                        </div>
+                          </div>
+                        )}
                       </Card>
                     ))
                   ) : (
@@ -745,13 +1047,11 @@ export const LibraryModal = ({ open, onOpenChange, initialCategory }: LibraryMod
                 </div>
               )}
             </div>
+              </div>
+            )}
           </div>
         </DialogContent>
 
-        <DialogActions className={styles.footer}>
-          <Button appearance="secondary" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button appearance="primary" onClick={() => onOpenChange(false)}>Done</Button>
-        </DialogActions>
       </DialogSurface>
     </Dialog>
   );
