@@ -11,6 +11,7 @@ import {
   Button,
   mergeClasses,
 } from '@fluentui/react-components';
+import { FavoritesPane } from './FavoritesPane';
 import { Star24Regular, Search24Regular, ChevronDown16Regular, ChevronRight16Regular, ChevronUp16Regular, ArrowUpRight16Regular } from '@fluentui/react-icons';
 import { EmptyState } from '../common/EmptyState';
 import { getIconByName, isConnector } from '../../utils/iconUtils';
@@ -56,13 +57,13 @@ const useStyles = makeStyles({
     }
   },
   /* Container styles */
-  container: {
+  contentContainer: {
     display: 'flex',
     flexDirection: 'column',
     height: '100%',
     width: '100%',
     boxSizing: 'border-box',
-    padding: `${tokens.spacingVerticalM} 8px`,
+    padding: `0 8px`, // Removed top/bottom padding, kept horizontal padding
     '&.empty': {
       overflow: 'visible',
       height: 'auto',
@@ -70,6 +71,89 @@ const useStyles = makeStyles({
     '&:not(.empty)': {
       overflowY: 'auto',
     }
+  },
+  
+  // Special container for favorites tab
+  // This is a global CSS rule to target the specific element shown in the screenshot
+  '@global': {
+    /* Add spacing to the top of the Favorites tab */
+    '.favorites-tab-content': {
+      paddingTop: '16px !important',
+    },
+    'div[class*="___1dc11em_"]': {
+      height: '32px !important',
+      minHeight: '32px !important',
+      maxHeight: '32px !important',
+      lineHeight: '32px !important',
+    },
+    // Ensure all accordion headers have 32px height
+    '.fui-AccordionHeader': {
+      height: '32px !important',
+      minHeight: '32px !important',
+      maxHeight: '32px !important',
+      lineHeight: '32px !important',
+      boxSizing: 'border-box',
+    },
+    // Center the filter button icon
+    '#menur5': {
+      display: 'flex !important',
+      alignItems: 'center !important',
+      justifyContent: 'center !important',
+    },
+    '#menur5 .fui-Button__icon': {
+      display: 'flex !important',
+      alignItems: 'center !important',
+      justifyContent: 'center !important',
+    },
+  },
+  favoritesContainer: {
+    backgroundColor: 'transparent',
+    borderRadius: '0',
+    padding: '0',
+    margin: '16px 0 0 0', // Add 16px margin to the top of the container
+    boxShadow: 'none',
+    // Ensure all accordion headers have 32px height
+    '& .fui-AccordionHeader': {
+      height: '32px !important',
+      minHeight: '32px !important',
+      maxHeight: '32px !important',
+      lineHeight: '32px !important',
+      boxSizing: 'border-box',
+    },
+    '& > div, & > div > div': {
+      backgroundColor: 'transparent',
+    },
+    '& .groupItemsContainer, & .accordionPanel, & .fui-AccordionPanel': {
+      backgroundColor: 'transparent !important',
+      boxShadow: 'none !important',
+      borderRadius: '0 !important',
+    },
+    // Hide any spacer elements that push content to the right
+    '& [class*="___1u3rbdd_1sfwjdk"]': {
+      display: 'none !important',
+    },
+    // Ensure header is exactly 32px in height - target all possible header elements
+    '& div[class*="groupHeaderContainer"], & div[class*="headerContainer"], & div[class*="header"], & div[class*="Adobe"]': {
+      height: '32px !important',
+      minHeight: '32px !important',
+      maxHeight: '32px !important',
+      lineHeight: '32px !important',
+      boxSizing: 'border-box',
+    },
+    // Target all header elements in the Favorites tab
+    '& div[class*="___f39xgn0_0000000"]': {
+      height: '32px !important',
+      minHeight: '32px !important',
+      maxHeight: '32px !important',
+      lineHeight: '32px !important',
+    },
+    // Target the specific div element with dimensions shown in screenshot (428x24)
+    '& div[class*="___1dc11em_"]': {
+      height: '32px !important',
+      minHeight: '32px !important',
+      maxHeight: '32px !important',
+      lineHeight: '32px !important',
+    },
   },
   
   groupContainer: {
@@ -159,7 +243,7 @@ const useStyles = makeStyles({
     flexDirection: 'column',
     gap: tokens.spacingVerticalXS,
     margin: 0,
-    backgroundColor: 'white',
+    backgroundColor: 'transparent',
   },
   accordionPanel: {
     padding: '0',
@@ -167,7 +251,7 @@ const useStyles = makeStyles({
     '& .fui-AccordionPanel': {
       margin: '0',
       padding: '0',
-      backgroundColor: 'white',
+      backgroundColor: 'transparent',
     },
   },
   accordionHeader: {
@@ -202,7 +286,11 @@ const useStyles = makeStyles({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    height: '32px',
+    height: '32px !important',
+    minHeight: '32px !important',
+    maxHeight: '32px !important',
+    lineHeight: '32px !important',
+    boxSizing: 'border-box',
   },
   categoryContainer: {
     backgroundColor: tokens.colorNeutralBackground1, /* White background */
@@ -247,11 +335,13 @@ const useStyles = makeStyles({
     cursor: 'pointer',
     display: 'flex',
     alignItems: 'center',
+    justifyContent: 'center', // Center horizontally
     gap: '4px',
     color: tokens.colorBrandForeground1,
     marginTop: tokens.spacingVerticalXL,
     marginBottom: tokens.spacingVerticalXS,
     paddingTop: tokens.spacingVerticalM,
+    width: '100%', // Ensure it takes full width for proper centering
     '&:hover': {
       textDecoration: 'underline',
     },
@@ -286,9 +376,12 @@ const useStyles = makeStyles({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: `${tokens.spacingVerticalS} ${tokens.spacingHorizontalS}`,
+    padding: '4px 12px 4px 10px', // Match the installed items padding
     borderRadius: '8px',
     cursor: 'pointer',
+    margin: '2px 0', // Match the installed items margin
+    height: '32px', // Set a fixed height to match installed items
+    boxSizing: 'border-box',
     '&:hover': {
       backgroundColor: tokens.colorNeutralBackground1Hover,
     },
@@ -439,8 +532,16 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
 
   // Handle clicking on an uninstalled item
   const handleUninstalledItemClick = (moduleId: string): void => {
-    // Open the library with the appropriate category
-    openLibraryWithCategory(moduleId);
+    setLibraryDialogProps({
+      open: true,
+      initialItemId: moduleId,
+    });
+  };
+
+  // Handle action click
+  const handleActionClick = (action: DetailedActionItem) => {
+    // Add any action click handling logic here
+    console.log('Action clicked:', action.title);
   };
 
   // Filter to only show installed modules
@@ -593,9 +694,121 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
   };
 
   // Render a group with its items and subgroups
-  const renderGroup = (group: ActionGroup): JSX.Element => {
+  // Custom header component with fixed height for Favorites tab
+const FavoritesHeader = ({ group, isFirst }: { group: ActionGroup, isFirst?: boolean }) => {
+  return (
+    <div 
+      className={styles.groupHeaderContainer} 
+      style={{ 
+        height: '32px', 
+        minHeight: '32px', 
+        maxHeight: '32px',
+        lineHeight: '32px',
+        padding: '0',
+        display: 'flex',
+        alignItems: 'center',
+        marginTop: isFirst ? '16px' : undefined
+      }} 
+    >
+      <div className={styles.groupHeaderLeft}>
+        {group.icon && (
+          <span 
+            className={`${styles.groupIcon} ${getIconBackgroundClass(group.iconColor)} ${getIconColorClass(group.iconColor)}`}
+            style={{ flexShrink: 0 }}
+          >
+            {getIconByName(group.icon, group.id)}
+          </span>
+        )}
+        <Text 
+          className={styles.groupTitle}
+          style={{ lineHeight: '32px' }}
+        >
+          {group.title}
+        </Text>
+      </div>
+    </div>
+  );
+};
+
+const renderGroup = (group: ActionGroup): JSX.Element => {
     const isExpanded = expandedGroups[group.id] === true;
 
+    // For the Favorites tab, render without accordion/expand-collapse functionality
+    if (activeTab === 'Favorites') {
+      return (
+        <div key={group.id} className={styles.groupContainer}>
+          <div className={styles.expandableGroup}>
+            {/* Group header */}
+            <FavoritesHeader group={group} />
+            
+            {/* Group items (no accordion panel) - with white background, rounded corners, and padding */}
+            <div style={{ 
+              display: 'flex',
+              flexDirection: 'column',
+              gap: tokens.spacingVerticalXS,
+              margin: 0,
+              backgroundColor: 'white',
+              borderRadius: '8px',
+              padding: '8px',
+              marginTop: '4px', // Reduced space between header and white container
+              marginBottom: '20px' // Increased space after each white container to 20px
+            }}>
+              {/* Render items */}
+              {group.items.map(item => (
+                <div key={item.id} className={styles.actionItem}>
+                  <ActionItem 
+                    item={{
+                      ...item, 
+                      isFavorite: !!favoriteItems[item.id],
+                      // Remove icon for actions
+                      icon: undefined,
+                      iconColor: undefined
+                    }}
+                    onFavoriteChange={(itemId, isFavorite) => {
+                      onFavoriteChange && onFavoriteChange(itemId, isFavorite);
+                    }}
+                    inFavoritesTab={true}
+                  />
+                </div>
+              ))}
+            </div>
+            
+            {/* Render subgroups if they exist */}
+            {group.subGroups && group.subGroups.length > 0 && (
+              <div className={styles.subGroupsContainer}>
+                {group.subGroups.map(subGroup => (
+                  <div key={subGroup.id}>
+                    <div className={styles.subGroupHeader}>
+                      <Text className={styles.subGroupTitle} weight="semibold">
+                        {subGroup.title}
+                      </Text>
+                    </div>
+                    <div className={styles.groupItemsContainer}>
+                      {subGroup.items.map(item => (
+                        <div key={item.id} className={styles.actionItem}>
+                          <ActionItem 
+                            item={{
+                              ...item, 
+                              isFavorite: !!favoriteItems[item.id],
+                              // Remove icon for actions
+                              icon: undefined,
+                              iconColor: undefined
+                            }}
+                            onFavoriteChange={onFavoriteChange || (() => {})}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // For other tabs, use the accordion/expand-collapse functionality
     return (
       <div key={group.id} className={styles.groupContainer}>
         <Accordion
@@ -631,7 +844,7 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
                       }}
                       onFavoriteChange={(itemId, isFavorite) => {
                         onFavoriteChange && onFavoriteChange(itemId, isFavorite);
-                      }} 
+                      }}
                     />
                   </div>
                 ))}
@@ -658,7 +871,7 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
                                 icon: undefined,
                                 iconColor: undefined
                               }}
-                              onFavoriteChange={onFavoriteChange || (() => {})} 
+                              onFavoriteChange={onFavoriteChange || (() => {})}
                             />
                           </div>
                         ))}
@@ -798,7 +1011,7 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
   }
 
   const isEmptyState = filteredGroups.length === 0;
-  const containerClasses = `${styles.container}${isEmptyState ? ' empty' : ''}`;
+  const containerClasses = `${styles.contentContainer}${isEmptyState ? ' empty' : ''}`;
 
   const renderContent = () => {
     // Check if we actually have any uninstalled actions to show after filtering
@@ -908,19 +1121,24 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
             </>
           ) : (
             // Render without categories
-            <>
-              {activeTab === 'Favorites' ? (
-                // Add extra margin for favorites view and use non-collapsible rendering
-                installedGroups.map((group: ActionGroup) => (
-                  <div key={group.id} style={{ marginBottom: tokens.spacingVerticalL }}>
-                    {renderFavoriteGroup(group)}
-                  </div>
-                ))
-              ) : (
-                // Regular rendering for other tabs
-                installedGroups.map((group: ActionGroup) => renderGroup(group))
-              )}
-            </>
+            activeTab === 'Favorites' ? (
+              <>
+                <div style={{ height: '16px', width: '100%', flexShrink: 0 }}></div>
+                <div className={styles.favoritesContainer}>
+                  <FavoritesPane
+                  groups={installedGroups}
+                  favoriteItems={favoriteItems || {}}
+                  onFavoriteChange={onFavoriteChange}
+                  onActionClick={handleActionClick}
+                  searchQuery={searchQuery}
+                  setActiveTab={setActiveTab}
+                  />
+                </div>
+              </>
+            ) : (
+              // Regular rendering for other tabs
+              installedGroups.map((group: ActionGroup) => renderGroup(group))
+            )
           )}
           
           {/* Show uninstalled actions toggle - moved below the list of results */}
@@ -1046,7 +1264,10 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
 
   return (
     <>
-      <div className={containerClasses}>{renderContent()}</div>
+      <div className={containerClasses}>
+        {activeTab === 'Favorites' && <div style={{ height: '16px', width: '100%', flexShrink: 0 }}></div>}
+        {renderContent()}
+      </div>
       
       {/* Library Modal */}
       <LibraryModal 

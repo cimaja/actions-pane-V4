@@ -327,13 +327,16 @@ export class DataService {
         const icon = module?.icon || connector?.icon;
         const iconColor = module?.iconColor || connector?.iconColor;
         
+        // For Favorites tab, ensure we have a flat structure with no subGroups
         const actionGroup: ActionGroup = {
           id: moduleId,
           title,
           icon,
           iconColor,
           items: items,
-          tags: module?.tags || connector?.tags || []
+          tags: module?.tags || connector?.tags || [],
+          // Explicitly set subGroups to undefined to prevent accordion rendering
+          subGroups: undefined
         };
 
         // Only add category if it's defined in the module

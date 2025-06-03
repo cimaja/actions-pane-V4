@@ -84,6 +84,9 @@ const useStyles = makeStyles({
     height: '24px',
     minWidth: '24px',
     padding: '0',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   filterBadge: {
     position: 'absolute',

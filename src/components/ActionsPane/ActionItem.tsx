@@ -22,6 +22,7 @@ const useStyles = makeStyles({
     overflow: 'hidden',
     padding: '4px 12px 4px 10px',
     borderRadius: '8px',
+    margin: '2px 0',
   },
   containerActive: {
     backgroundColor: tokens.colorNeutralBackground1Hover,
@@ -80,9 +81,10 @@ const useStyles = makeStyles({
 interface ActionItemProps {
   item: ActionItemType;
   onFavoriteChange?: (itemId: string, isFavorite: boolean) => void;
+  inFavoritesTab?: boolean;
 }
 
-export const ActionItem: React.FC<ActionItemProps> = ({ item, onFavoriteChange }) => {
+export const ActionItem: React.FC<ActionItemProps> = ({ item, onFavoriteChange, inFavoritesTab = false }) => {
   const styles = useStyles();
   const [isFavorite, setIsFavorite] = useState(item.isFavorite || false);
   const [isHovered, setIsHovered] = useState(false);
@@ -157,15 +159,18 @@ export const ActionItem: React.FC<ActionItemProps> = ({ item, onFavoriteChange }
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        <span className={mergeClasses(
-          styles.iconWrapper,
-          item.iconColor ? getIconBackgroundClass(item.iconColor) : ''
-        )}>
+        {/* Only render the icon wrapper if not in Favorites tab */}
+        {!inFavoritesTab && (
           <span className={mergeClasses(
-            styles.icon,
-            item.iconColor ? getIconColorClass(item.iconColor) : ''
-          )}>{item.icon}</span>
-        </span>
+            styles.iconWrapper,
+            item.iconColor ? getIconBackgroundClass(item.iconColor) : ''
+          )}>
+            <span className={mergeClasses(
+              styles.icon,
+              item.iconColor ? getIconColorClass(item.iconColor) : ''
+            )}>{item.icon}</span>
+          </span>
+        )}
         <span className={styles.title}>{item.title}</span>
         <Button
           className={favoriteButtonClass}
