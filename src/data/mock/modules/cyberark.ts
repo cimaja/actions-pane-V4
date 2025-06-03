@@ -7,7 +7,8 @@ export const module: ActionGroup = {
   icon: 'cyberark20Regular',
   iconColor: 'blue',
   tags: ['Security', 'Authentication', 'PAM'], // Category tag for this module
-  category: 'Integration',
+  category: 'Integration',  author: 'Microsoft',
+
   items: [], // This will be populated with references to the actions
   isInstalled: true // Module is installed by default
 };

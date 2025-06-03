@@ -7,7 +7,8 @@ export const module: ActionGroup = {
   icon: 'arrowCircleDownUp20Regular',
   iconColor: 'blue',
   tags: ['Networking', 'File Transfer', 'Integration'], // Category tag for this module
-  category: 'Integration',
+  category: 'Integration',  author: 'Microsoft',
+
   items: [], // This will be populated with references to the actions
   isInstalled: true // Module is installed by default
 };

@@ -7,7 +7,8 @@ export const module: ActionGroup = {
   icon: 'customGlobe20Regular',
   iconColor: 'blue',
   tags: ['Web', 'API', 'Networking'], // Category tag for this module
-  category: 'Integration',
+  category: 'Integration',  author: 'Microsoft',
+
   items: [], // This will be populated with references to the actions
   isInstalled: true // Set the module as installed by default
 };

@@ -7,7 +7,8 @@ export const module: ActionGroup = {
   icon: 'globe24Regular',
   iconColor: 'orange',
   tags: ['Automation', 'Web', 'Testing'], // Category tag for this module
-  category: 'Interaction',
+  category: 'Interaction',  author: 'Microsoft',
+
   items: [], // This will be populated with references to the actions
   isInstalled: true, // Set as installed by default
   subGroups: [

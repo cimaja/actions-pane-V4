@@ -7,7 +7,8 @@ export const module: ActionGroup = {
   icon: 'database20Regular',
   iconColor: 'blue',
   tags: ['Data', 'Database', 'Integration'], // Category tag for this module
-  category: 'Integration',
+  category: 'Integration',  author: 'Microsoft',
+
   items: [], // This will be populated with references to the actions
   isInstalled: false // Module is not installed by default
 };

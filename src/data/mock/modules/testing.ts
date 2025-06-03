@@ -7,7 +7,8 @@ export const module: ActionGroup = {
   icon: 'beaker24Regular',
   iconColor: 'red', // Logic category color
   tags: ['Testing', 'Quality Assurance', 'Development'], // Category tag for this module
-  category: 'Logic',
+  category: 'Logic',  author: 'Microsoft',
+
   items: [],
   isInstalled: true // Module is installed by default
 };

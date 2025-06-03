@@ -7,7 +7,8 @@ export const module: ActionGroup = {
   icon: 'documentData24Regular',
   iconColor: 'red', // Logic category color
   tags: ['Development', 'Debugging', 'Monitoring'], // Category tag for this module
-  category: 'Logic',
+  category: 'Logic',  author: 'Microsoft',
+
   items: [
     {
       id: 'log-message',

@@ -257,7 +257,8 @@ export class DataService {
           iconColor: module.iconColor,
           tags: module.tags,
           category: module.category, // Include the module's category
-          description: `Contains ${module.items.length} actions`,
+          author: module.author || 'Microsoft', // Include the module's author with fallback
+          description: '',
           isInstalled: module.isInstalled === true, // Respect the module's isInstalled flag, ensuring it's a boolean
           actions: module.items
         }));
@@ -266,9 +267,9 @@ export class DataService {
           ...connector,
           actions: this._connectorActions.filter(action => action.moduleId === connector.id)
         }));
-      case 'Custom Actions':
+      case 'Custom actions':
         return []; // To be implemented
-      case 'UI Collections':
+      case 'UI collections':
         return []; // To be implemented
       case 'Templates':
         return []; // To be implemented

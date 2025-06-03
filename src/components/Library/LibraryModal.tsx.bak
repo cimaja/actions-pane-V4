@@ -252,11 +252,17 @@ const useStyles = makeStyles({
   additionalInfo: {
     display: 'flex',
     flexDirection: 'column',
-    marginBottom: '16px',
-    marginTop: '16px',
+    gap: '16px',
+    padding: '16px',
+    border: `1px solid ${tokens.colorNeutralStroke2}`,
+    borderRadius: tokens.borderRadiusMedium,
+    marginBottom: '0',
+    backgroundColor: tokens.colorNeutralBackground1,
+    margin: 0,
     width: '100%',
     boxSizing: 'border-box',
     maxWidth: 'none',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
   },
   infoRow: {
     display: 'flex',
@@ -273,7 +279,9 @@ const useStyles = makeStyles({
   infoItem: {
     display: 'flex',
     flexDirection: 'column',
-    width: '100%',
+    gap: '4px',
+    flex: '1 1 0',
+    minWidth: '200px',
   },
   infoLabel: {
     fontSize: tokens.fontSizeBase200,
@@ -309,25 +317,6 @@ const useStyles = makeStyles({
       textDecoration: 'underline',
     },
   },
-  actionsHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '12px 16px',
-    backgroundColor: tokens.colorNeutralBackground2,
-    border: `1px solid ${tokens.colorNeutralStroke2}`,
-    borderBottom: `1px solid ${tokens.colorNeutralStroke2}`,
-    borderTopLeftRadius: tokens.borderRadiusMedium,
-    borderTopRightRadius: tokens.borderRadiusMedium,
-    margin: 0,
-    width: '100%',
-    boxSizing: 'border-box',
-    maxWidth: 'none',
-    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-  },
-  actionsDetailList: {
-    display: 'flex',
-    flexDirection: 'column',
     width: '100%',
     boxSizing: 'border-box',
     border: `1px solid ${tokens.colorNeutralStroke2}`,
@@ -340,7 +329,6 @@ const useStyles = makeStyles({
     margin: 0,
     padding: 0,
     maxWidth: 'none',
-    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
   },
   actionListItem: {
     display: 'flex',
@@ -651,22 +639,21 @@ const useStyles = makeStyles({
   categoryGroup: {
     display: 'flex',
     flexDirection: 'column',
-    marginBottom: '24px',
-    paddingLeft: tokens.spacingHorizontalL,
-    paddingRight: tokens.spacingHorizontalL
+    gap: 0,
+    marginBottom: '32px'
   },
   categoryHeader: {
     marginTop: 0,
-    marginBottom: '8px',
-    paddingLeft: 0
+    marginBottom: 0
   },
   itemsGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(2, 1fr)',
     gap: tokens.spacingHorizontalM,
     width: '100%',
+    marginTop: 0,
     boxSizing: 'border-box',
-    padding: 0
+    padding: '0 16px 0 16px'
   },
 });
 
@@ -681,7 +668,7 @@ export const LibraryModal: React.FC<LibraryModalProps> = ({ open, onOpenChange, 
   const styles = useStyles();
   const [activeTab, setActiveTab] = useState<LibraryCategoryType>('Built-in');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [sortType, setSortType] = useState<'name' | 'category'>('category');
+  const [sortType, setSortType] = useState<'name' | 'category'>('name');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<LibraryItemType | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'details'>('list');
@@ -689,7 +676,7 @@ export const LibraryModal: React.FC<LibraryModalProps> = ({ open, onOpenChange, 
   // Get all available library items
   const getAllLibraryItems = (): LibraryItemType[] => {
     let allItems: LibraryItemType[] = [];
-    ['Built-in', 'Connectors', 'Custom actions', 'UI collections', 'Templates'].forEach(category => {
+    ['Built-in', 'Connectors', 'Custom Actions', 'UI Collections', 'Templates'].forEach(category => {
       allItems = [...allItems, ...dataService.getLibraryItemsByCategory(category as LibraryCategoryType)];
     });
     return allItems;
@@ -699,7 +686,7 @@ export const LibraryModal: React.FC<LibraryModalProps> = ({ open, onOpenChange, 
   useEffect(() => {
     if (initialCategory) {
       // Check if initialCategory is a valid LibraryCategoryType
-      if (['Built-in', 'Connectors', 'Custom actions', 'UI collections', 'Templates'].includes(initialCategory)) {
+      if (['Built-in', 'Connectors', 'Custom Actions', 'UI Collections', 'Templates'].includes(initialCategory)) {
         setActiveTab(initialCategory as LibraryCategoryType);
       }
     }
@@ -799,19 +786,19 @@ export const LibraryModal: React.FC<LibraryModalProps> = ({ open, onOpenChange, 
     
     switch (category) {
       case 'Built-in':
-        IconComponent = isActive ? Cube24Filled : Cube24Regular;
+        IconComponent = isActive ? PuzzlePiece24Filled : PuzzlePiece24Regular;
         break;
       case 'Connectors':
         IconComponent = isActive ? PlugConnected24Filled : PlugConnected24Regular;
         break;
-      case 'Custom actions':
-        IconComponent = isActive ? PuzzlePiece24Filled : PuzzlePiece24Regular;
-        break;
-      case 'UI collections':
+      case 'Custom Actions':
         IconComponent = isActive ? Shapes24Filled : Shapes24Regular;
         break;
-      case 'Templates':
+      case 'UI Collections':
         IconComponent = isActive ? Book24Filled : Book24Regular;
+        break;
+      case 'Templates':
+        IconComponent = isActive ? Cube24Filled : Cube24Regular;
         break;
       default:
         IconComponent = isActive ? Cube24Filled : Cube24Regular;
@@ -859,17 +846,7 @@ export const LibraryModal: React.FC<LibraryModalProps> = ({ open, onOpenChange, 
               </div>
               
               <div className={styles.detailsTextContent}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Text size={600} weight="semibold" className={styles.detailsTitle}>{selectedItem.title}</Text>
-                  {selectedItem.isInstalled && (
-                    <Badge 
-                      appearance="tint"
-                      color="success"
-                      icon={<Checkmark12Regular />}
-                      size="small"
-                    />
-                  )}
-                </div>
+                <Text size={600} weight="semibold" className={styles.detailsTitle}>{selectedItem.title}</Text>
                 <Text 
                   size={300}
                   style={{
@@ -878,7 +855,7 @@ export const LibraryModal: React.FC<LibraryModalProps> = ({ open, onOpenChange, 
                     lineHeight: 1,
                   }}
                 >
-                  {selectedItem.author || 'Unknown author'}
+                  {getItemCategory(selectedItem)}
                 </Text>
               </div>
             </div>
@@ -910,29 +887,60 @@ export const LibraryModal: React.FC<LibraryModalProps> = ({ open, onOpenChange, 
             </div>
           </div>
           
-          {/* Description Section */}
-          {selectedItem.description && (
-            <div className={styles.additionalInfo}>
-              <div className={styles.infoItem} style={{ width: '100%' }}>
+          {/* Additional Information Section */}
+          <div className={styles.additionalInfo}>
+            <div className={styles.infoRow}>
+              {selectedItem.author && (
+                <div className={styles.infoItem}>
+                  <Text className={styles.infoLabel}>Author</Text>
+                  <Text className={styles.infoValue}>{selectedItem.author}</Text>
+                </div>
+              )}
+              
+              {selectedItem.tags && selectedItem.tags.length > 0 && (
+                <div className={styles.infoItem}>
+                  <Text className={styles.infoLabel}>Tags</Text>
+                  <div className={styles.tagContainer}>
+                    {selectedItem.tags.map(tag => (
+                      <span key={tag} className={styles.tag}>{tag}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              <div className={styles.infoItem}>
+                <Text className={styles.infoLabel}>Last updated</Text>
                 <Text className={styles.infoValue}>
-                  {selectedItem.description}
+                  {selectedItem.lastUpdated || 'Not specified'}
                 </Text>
               </div>
             </div>
-          )}
+            
+            {selectedItem.description && (
+              <>
+                <div className={styles.divider}></div>
+                <div className={styles.infoItem} style={{ width: '100%', marginTop: '0' }}>
+                  <Text className={styles.infoValue}>
+                    {selectedItem.description}
+                    <br />
+                    <a 
+                      href={`https://learn.microsoft.com/en-us/connectors/${selectedItem.id}/`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className={styles.documentationLink}
+                    >
+                      View Power Automate documentation
+                    </a>
+                  </Text>
+                </div>
+              </>
+            )}
+          </div>
           <div className={styles.detailsActions}>
             <div className={styles.actionsHeader}>
               <Text size={300} weight="semibold">
                 {actions.length} action{actions.length !== 1 ? 's' : ''}
               </Text>
-              <a 
-                href={`https://learn.microsoft.com/en-us/connectors/${selectedItem.id}/`} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className={styles.documentationLink}
-              >
-                View documentation
-              </a>
             </div>
             
             {actions.length > 0 ? (
@@ -989,7 +997,7 @@ export const LibraryModal: React.FC<LibraryModalProps> = ({ open, onOpenChange, 
           {/* Left Navigation - Only show in list view */}
           {viewMode === 'list' && (
             <div className={styles.navSidebar}>
-              {(['Built-in', 'Connectors', 'Custom actions', 'UI collections', 'Templates'] as LibraryCategoryType[]).map((category) => (
+              {(['Built-in', 'Connectors', 'Custom Actions', 'UI Collections', 'Templates'] as LibraryCategoryType[]).map((category) => (
                 <div 
                   key={category} 
                   className={`${styles.navItem} ${activeTab === category ? 'selected' : ''}`}
@@ -1077,8 +1085,8 @@ export const LibraryModal: React.FC<LibraryModalProps> = ({ open, onOpenChange, 
                   title="No templates yet"
                   description="Templates are pre-built workflow configurations that can be used as starting points for common automation scenarios."
                 />
-              ) : activeTab === 'UI collections' && (!processedItems.grouped && processedItems.items.length === 0 || processedItems.grouped && processedItems.categories.length === 0) ? (
-                // Empty state for UI collections tab
+              ) : activeTab === 'UI Collections' && (!processedItems.grouped && processedItems.items.length === 0 || processedItems.grouped && processedItems.categories.length === 0) ? (
+                // Empty state for UI Collections tab
                 <EmptyState
                   image={
                     <svg width="64" height="64" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1094,8 +1102,8 @@ export const LibraryModal: React.FC<LibraryModalProps> = ({ open, onOpenChange, 
                   title="No UI collections yet"
                   description="UI collections help organize and manage related UI components for better reusability across workflows."
                 />
-              ) : activeTab === 'Custom actions' && (!processedItems.grouped && processedItems.items.length === 0 || processedItems.grouped && processedItems.categories.length === 0) ? (
-                // Empty state for Custom actions tab
+              ) : activeTab === 'Custom Actions' && (!processedItems.grouped && processedItems.items.length === 0 || processedItems.grouped && processedItems.categories.length === 0) ? (
+                // Empty state for Custom Actions tab
                 <EmptyState
                   image={
                     <svg width="64" height="64" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1137,9 +1145,16 @@ export const LibraryModal: React.FC<LibraryModalProps> = ({ open, onOpenChange, 
                           <div className={styles.cardContent}>
                             <Text className={styles.cardTitle}>{item.title}</Text>
 
-                            {/* Show author instead of category */}
+                            {/* Show category directly from the first tag */}
                             <Text className={styles.category}>
-                              {item.author || 'Unknown author'}
+                              {(() => {
+                                const moduleItem = item as ModuleItemType;
+                                const category = moduleItem.tags && moduleItem.tags.length > 0
+                                  ? moduleItem.tags[0]
+                                  : 'Other';
+                                
+                                return category;
+                              })()}
                             </Text>
                           </div>
                           {item.isInstalled && (
@@ -1180,7 +1195,7 @@ export const LibraryModal: React.FC<LibraryModalProps> = ({ open, onOpenChange, 
                           <Text className={styles.cardTitle}>{item.title}</Text>
 
                           <Text className={styles.category}>
-                            {item.author || 'Unknown author'}
+                            {getItemCategory(item)}
                           </Text>
                         </div>
                         {item.isInstalled && (

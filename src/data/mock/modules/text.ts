@@ -7,7 +7,8 @@ export const module: ActionGroup = {
   icon: 'textField24Regular',
   iconColor: 'amber',
   tags: ['Text Processing', 'Data', 'Utilities'], // Category tag for this module
-  category: 'Data',
+  category: 'Data',  author: 'Microsoft',
+
   items: [], // This will be populated with references to the actions
   isInstalled: true // Set the module as installed by default
 };

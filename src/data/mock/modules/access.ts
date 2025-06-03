@@ -8,6 +8,7 @@ export const module: ActionGroup = {
   iconColor: 'blue',
   category: 'Integration',
   tags: ['Office', 'Integration', 'Database'],
+  author: 'Microsoft',
   items: [],
   isInstalled: false // Module is not installed by default
 };

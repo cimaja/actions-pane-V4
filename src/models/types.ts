@@ -34,6 +34,7 @@ export interface ActionGroup {
   tags?: string[]; // Adding tags for categorization
   category?: ModuleCategory; // Adding category for module/connector classification
   isInstalled?: boolean; // Adding isInstalled flag for module installation status
+  author?: string; // Adding author property for attribution
 }
 
 // Module categories
@@ -80,4 +81,4 @@ export interface LibraryItemType {
 export type TabType = 'All' | 'Built-in' | 'Connectors' | 'Favorites';
 
 // Library category type definition
-export type LibraryCategoryType = 'Built-in' | 'Connectors' | 'Custom Actions' | 'UI Collections' | 'Templates';
+export type LibraryCategoryType = 'Built-in' | 'Connectors' | 'Custom actions' | 'UI collections' | 'Templates';

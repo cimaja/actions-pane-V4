@@ -1,13 +1,16 @@
 {
   "files": {
-    "main.css": "/actions-pane-V4/static/css/main.545d0638.css",
-    "main.js": "/actions-pane-V4/static/js/main.feb4d8cf.js",
+    "main.css": "/actions-pane-V4/static/css/main.6e1893aa.css",
+    "main.js": "/actions-pane-V4/static/js/main.51a21a74.js",
+    "static/media/Jira.png": "/actions-pane-V4/static/media/Jira.8983cb7036211c8dcecb.png",
+    "static/media/SharePoint.png": "/actions-pane-V4/static/media/SharePoint.5c36b8152d853047c3a0.png",
+    "static/media/Microsoft Forms.png": "/actions-pane-V4/static/media/Microsoft Forms.d811caac57cf0091d161.png",
     "index.html": "/actions-pane-V4/index.html",
-    "main.545d0638.css.map": "/actions-pane-V4/static/css/main.545d0638.css.map",
-    "main.feb4d8cf.js.map": "/actions-pane-V4/static/js/main.feb4d8cf.js.map"
+    "main.6e1893aa.css.map": "/actions-pane-V4/static/css/main.6e1893aa.css.map",
+    "main.51a21a74.js.map": "/actions-pane-V4/static/js/main.51a21a74.js.map"
   },
   "entrypoints": [
-    "static/css/main.545d0638.css",
-    "static/js/main.feb4d8cf.js"
+    "static/css/main.6e1893aa.css",
+    "static/js/main.51a21a74.js"
   ]
 }

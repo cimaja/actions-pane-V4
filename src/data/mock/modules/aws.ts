@@ -7,7 +7,8 @@ export const module: ActionGroup = {
   icon: 'aws20Regular',
   iconColor: 'blue',
   tags: ['Cloud', 'Integration', 'Automation'], // Category tag for this module
-  category: 'Integration',
+  category: 'Integration',  author: 'Microsoft',
+
   items: [], // This will be populated with references to the actions
   isInstalled: false, // Module is not installed by default
   subGroups: [] // Will be populated with subcategories

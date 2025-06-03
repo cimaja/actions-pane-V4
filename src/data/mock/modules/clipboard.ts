@@ -7,7 +7,8 @@ export const module: ActionGroup = {
   icon: 'clipboard24Regular', // Using cube icon since Paste isn't in our icon set
   iconColor: 'orange',
   tags: ['Productivity', 'System'], // Category tag for this module
-  category: 'Interaction',
+  category: 'Interaction',  author: 'Microsoft',
+
   items: [], // This will be populated with references to the actions
   isInstalled: true // Set the module as installed by default
 };

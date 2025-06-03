@@ -66,7 +66,8 @@ export const module: ActionGroup = {
   icon: 'brainCircuit24Regular',
   iconColor: 'blue',
   tags: ['AI/ML', 'Microsoft', 'Integration'], // Category tag for this module
-  category: 'Integration',
+  category: 'Integration',  author: 'Microsoft',
+
   items: [],
   subGroups: [
     bingSpellCheckGroup,

@@ -8,7 +8,8 @@ export const module: ActionGroup = {
   iconColor: 'blue', // Integration category color
   tags: ['Office', 'Spreadsheet', 'Data'], // Category tag for this module
   category: 'Integration',
-  isInstalled: false, // Module is installed by default
+  isInstalled: false, // Module is installed by default  author: 'Microsoft',
+
   items: [],
   subGroups: [
     {

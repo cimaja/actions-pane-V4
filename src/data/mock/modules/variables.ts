@@ -7,7 +7,8 @@ export const module: ActionGroup = {
   icon: 'bracesVariable24Regular',
   iconColor: 'red',
   tags: ['Data', 'Variables', 'Development'], // Category tag for this module
-  category: 'Logic',
+  category: 'Logic',  author: 'Microsoft',
+
   items: [], // This will be populated with references to the actions
   isInstalled: true, // Set the module as installed by default
   subGroups: [] // Will be populated with subcategories

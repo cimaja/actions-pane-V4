@@ -96,7 +96,8 @@ export const module: ActionGroup = {
   icon: 'googleCognitive20Regular',
   iconColor: 'blue', // Blue color for Integration category
   tags: ['AI/ML', 'Google', 'Integration'], // Category tag for this module
-  category: 'Integration',
+  category: 'Integration',  author: 'Microsoft',
+
   items: [],
   subGroups: [naturalLanguageGroup, visionGroup],
   isInstalled: false,

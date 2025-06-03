@@ -7,7 +7,8 @@ export const module: ActionGroup = {
   icon: 'lockClosed24Regular',
   iconColor: 'teal',
   tags: ['Security', 'Data Protection', 'Encryption'], // Category tag for this module
-  category: 'Scripting',
+  category: 'Scripting',  author: 'Microsoft',
+
   items: [], // This will be populated with references to the actions
   isInstalled: false // Module is not installed by default
 };

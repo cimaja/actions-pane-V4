@@ -7,7 +7,8 @@ export const module: ActionGroup = {
   icon: 'arrowRepeatAll24Regular', // Using code icon since ArrowRepeatAll isn't in our icon set
   iconColor: 'red',
   tags: ['Logic', 'Flow Control', 'Development'], // Category tag for this module
-  category: 'Logic',
+  category: 'Logic',  author: 'Microsoft',
+
   items: [], // This will be populated with references to the actions
   isInstalled: true // Set the module as installed by default
 };

@@ -7,7 +7,8 @@ export const module: ActionGroup = {
   icon: 'documentPdf24Regular',
   iconColor: 'amber',
   tags: ['Files', 'Documents', 'Data'], // Category tag for this module
-  category: 'Data',
+  category: 'Data',  author: 'Microsoft',
+
   items: [], // This will be populated with references to the actions
   isInstalled: true // Set as installed by default
 };

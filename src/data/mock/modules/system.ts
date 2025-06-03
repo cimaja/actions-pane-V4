@@ -7,7 +7,8 @@ export const module: ActionGroup = {
   icon: 'window24Regular',
   iconColor: 'green',
   category: 'System',
-  tags: ['System', 'OS', 'Administration'], // Category tag for this module
+  tags: ['System', 'OS', 'Administration'], // Category tag for this module  author: 'Microsoft',
+
   items: [], // This will be populated with references to the actions
   isInstalled: false // Module is not installed by default
 };

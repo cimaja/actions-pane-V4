@@ -7,7 +7,8 @@ export const module: ActionGroup = {
   icon: 'code20Regular',
   iconColor: 'amber',
   tags: ['Data', 'XML', 'Parsing'], // Category tag for this module
-  category: 'Data',
+  category: 'Data',  author: 'Microsoft',
+
   items: [], // This will be populated with references to the actions
   isInstalled: false // Module is not installed by default
 };
