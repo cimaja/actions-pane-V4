@@ -1,7 +1,9 @@
 export const brandColors = {
   // Brand colors
   brand20: '#00265E',
+  brand30: '#003076',
   brand40: '#00398D',
+  brand50: '#0042A5',
   brand60: '#114AB0',
   brand70: '#0055D4',
   brand80: '#005EEB',
