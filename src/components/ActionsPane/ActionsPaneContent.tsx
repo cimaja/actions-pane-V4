@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   makeStyles,
   Text,
@@ -77,17 +77,17 @@ const useStyles = makeStyles({
   // This is a global CSS rule to target the specific element shown in the screenshot
   '@global': {
     /* Add spacing to the top of the Favorites tab */
-    '.favorites-tab-content': {
+    '&.favorites-tab-content': {
       paddingTop: '16px !important',
     },
-    'div[class*="___1dc11em_"]': {
+    '&div[class*="___1dc11em_"]': {
       height: '32px !important',
       minHeight: '32px !important',
       maxHeight: '32px !important',
       lineHeight: '32px !important',
     },
     // Ensure all accordion headers have 32px height
-    '.fui-AccordionHeader': {
+    '&.fui-AccordionHeader': {
       height: '32px !important',
       minHeight: '32px !important',
       maxHeight: '32px !important',
@@ -95,12 +95,12 @@ const useStyles = makeStyles({
       boxSizing: 'border-box',
     },
     // Center the filter button icon
-    '#menur5': {
+    '&#menur5': {
       display: 'flex !important',
       alignItems: 'center !important',
       justifyContent: 'center !important',
     },
-    '#menur5 .fui-Button__icon': {
+    '&#menur5 .fui-Button__icon': {
       display: 'flex !important',
       alignItems: 'center !important',
       justifyContent: 'center !important',
@@ -452,6 +452,9 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
   const [showUninstalledItems, setShowUninstalledItems] = useState<boolean>(false);
   
   // State for library dialog props
+  const [dataVersion, setDataVersion] = useState(0);
+
+  // State for library dialog props
   const [libraryDialogProps, setLibraryDialogProps] = useState<{
     open: boolean;
     initialCategory?: string;
@@ -459,6 +462,14 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
   }>({
     open: false
   });
+
+  // Subscribe to dataService updates to refresh content when installation status changes
+  useEffect(() => {
+    const unsubscribe = dataService.subscribe(() => {
+      setDataVersion(prevVersion => prevVersion + 1);
+    });
+    return unsubscribe; // Cleanup on unmount
+  }, []);
 
   // Get filtered groups from the data service and apply sorting
   // Make sure to recalculate when activeTab changes
@@ -507,7 +518,7 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
     }
 
     return { modules: sortedGroups, uninstalledCount: result.uninstalledCount };
-  }, [activeTab, searchQuery, sortOrder, favoriteItems]);
+  }, [activeTab, searchQuery, sortOrder, favoriteItems, dataVersion]);
 
   // Toggle group expansion
   const toggleGroup = (groupId: string) => {

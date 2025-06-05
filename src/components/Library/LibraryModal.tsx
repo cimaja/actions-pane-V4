@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import {
   makeStyles,
   Dialog,
@@ -685,54 +685,94 @@ export const LibraryModal: React.FC<LibraryModalProps> = ({ open, onOpenChange, 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<LibraryItemType | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'details'>('list');
-
-  // Get all available library items
-  const getAllLibraryItems = (): LibraryItemType[] => {
-    let allItems: LibraryItemType[] = [];
-    ['Built-in', 'Connectors', 'Custom actions', 'UI collections', 'Templates'].forEach(category => {
-      allItems = [...allItems, ...dataService.getLibraryItemsByCategory(category as LibraryCategoryType)];
-    });
-    return allItems;
-  };
-  
-  // Set active tab based on initialCategory if provided
-  useEffect(() => {
-    if (initialCategory) {
-      // Check if initialCategory is a valid LibraryCategoryType
-      if (['Built-in', 'Connectors', 'Custom actions', 'UI collections', 'Templates'].includes(initialCategory)) {
-        setActiveTab(initialCategory as LibraryCategoryType);
-      }
-    }
-    
-    // If initialItemId is provided, find the item and show details
-    if (initialItemId) {
-      const allItems = getAllLibraryItems();
-      const item = allItems.find(item => item.id === initialItemId);
-      if (item) {
-        setSelectedItem(item);
-        setViewMode('details');
-      }
-    }
-  }, [initialCategory, initialItemId]);
+  const [items, setItems] = useState<LibraryItemType[]>([]); // Holds items for the current activeTab
 
   // Helper function to get the category name for an item
-  const getItemCategory = (item: LibraryItemType): string => {
+  const getItemCategory = useCallback((item: LibraryItemType): string => {
     // If the item has a category defined, use it
     if (item.category) {
       return item.category;
     }
-    
     // Fallback to 'Other' if no category is defined
     return 'Other';
-  };
+  }, []);
+
+  // Get all available library items
+  const getAllLibraryItems = useCallback((): LibraryItemType[] => {
+    let allItems: LibraryItemType[] = [];
+    ['Built-in', 'Connectors', 'Custom actions', 'UI collections', 'Templates'].forEach(category => {
+      allItems = [...allItems, ...dataService.getLibraryItemsByCategory(category as LibraryCategoryType)];
+    });
+    // Ensure all items have their install state correctly reflected from dataService
+    // This is important because dataService loads install state from localStorage
+    return allItems.map(item => {
+      const liveItem = dataService.getLibraryItemsByCategory(getItemCategory(item) as LibraryCategoryType).find(i => i.id === item.id) || dataService.getAllConnectors().find(c => c.id === item.id);
+      return liveItem ? { ...item, isInstalled: liveItem.isInstalled } : item;
+    });
+  }, [getItemCategory]); // Add getItemCategory as a dependency
+  
+  // Effect to load items when the modal opens or activeTab changes
+  useEffect(() => {
+    if (open) {
+      setIsLoading(true);
+      const fetchedItems = dataService.getLibraryItemsByCategory(activeTab);
+      setItems(fetchedItems);
+      setIsLoading(false);
+    } else {
+      setItems([]); // Clear items when modal is closed
+      setViewMode('list'); // Reset to list view when closed
+      setSelectedItem(null); // Clear selection when closed
+    }
+  }, [open, activeTab]);
+
+  // Effect to handle initialCategory and initialItemId for deep linking or specific entry points
+  useEffect(() => {
+    if (open) {
+      let tabToSet = activeTab; // Default to current activeTab
+      let itemToSelectLocally = selectedItem;
+      let viewModeToSet = viewMode;
+
+      if (initialCategory && ['Built-in', 'Connectors', 'Custom actions', 'UI collections', 'Templates'].includes(initialCategory)) {
+        tabToSet = initialCategory as LibraryCategoryType;
+      }
+
+      if (initialItemId) {
+        const allAvailableItems = getAllLibraryItems(); // Fetches all items with current install states
+        const foundItem = allAvailableItems.find((item: LibraryItemType) => item.id === initialItemId);
+        if (foundItem) {
+          itemToSelectLocally = foundItem;
+          viewModeToSet = 'details';
+          const itemActualCategory = getItemCategory(foundItem);
+          if (['Built-in', 'Connectors', 'Custom actions', 'UI collections', 'Templates'].includes(itemActualCategory)) {
+            tabToSet = itemActualCategory as LibraryCategoryType;
+          }
+        } else {
+          // If initialItemId is provided but not found, go to list view of tabToSet
+          itemToSelectLocally = null;
+          viewModeToSet = 'list';
+        }
+      }
+      
+      // Apply changes if they differ from current state to avoid unnecessary re-renders/loops
+      if (tabToSet !== activeTab) {
+        setActiveTab(tabToSet);
+      }
+      if (viewModeToSet !== viewMode) {
+        setViewMode(viewModeToSet);
+      }
+      // Check item equality carefully if it's an object, or just by ID if sufficient
+      if (itemToSelectLocally?.id !== selectedItem?.id) {
+        setSelectedItem(itemToSelectLocally);
+      }
+    }
+  }, [open, initialCategory, initialItemId, getAllLibraryItems, getItemCategory]);
 
   // Set sort type handler
   const setSortTypeHandler = (type: 'name' | 'category') => {
     setSortType(type);
   };
 
-  // Get library items based on the selected category and search query
-  const libraryItems = dataService.getLibraryItemsByCategory(activeTab);
+  // Note: libraryItems variable is removed; use `items` state directly for processedItems.
 
   // Define the type for processed items
   type ProcessedItems = 
@@ -741,53 +781,46 @@ export const LibraryModal: React.FC<LibraryModalProps> = ({ open, onOpenChange, 
 
   // Process items based on search query and sort type
   const processedItems = useMemo<ProcessedItems>(() => {
-    let items = libraryItems;
-    
+    let currentItemsToProcess = [...items]; // Start with a copy of items from state
+
     // Apply search filter if query exists
     if (searchQuery) {
-      items = items.filter(item => 
+      currentItemsToProcess = currentItemsToProcess.filter(item =>
         item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase()))
       );
     }
-    
-    if (sortType === 'name') {
-      // Sort by name only
-      return {
-        grouped: false,
-        items: [...items].sort((a, b) => a.title.localeCompare(b.title))
-      };
-    } else {
-      // Group by category
-      // Get all unique categories
-      const categoryMap = new Map<string, LibraryItemType[]>();
-      
-      // Group items by category
-      items.forEach(item => {
-        // Use the item's category or fallback to 'Other'
-        const category = getItemCategory(item);
-        
-        if (!categoryMap.has(category)) {
-          categoryMap.set(category, []);
+
+    // Apply sorting and grouping
+    if (sortType === 'category' && activeTab !== 'Connectors' && !searchQuery) {
+      // Group by category if not searching, not on Connectors tab, and sortType is category
+      const categoriesMap: { [key: string]: LibraryItemType[] } = {};
+      currentItemsToProcess.forEach(item => {
+        const categoryName = getItemCategory(item); // Ensure getItemCategory is defined above or memoized
+        if (!categoriesMap[categoryName]) {
+          categoriesMap[categoryName] = [];
         }
-        categoryMap.get(category)?.push(item);
+        categoriesMap[categoryName].push(item);
       });
-      
-      // Convert map to array of categories with their items
-      const categories = Array.from(categoryMap.entries()).map(([name, items]) => ({
-        name,
-        items: items.sort((a, b) => a.title.localeCompare(b.title))
-      }));
-      
-      // Sort categories alphabetically
-      categories.sort((a, b) => a.name.localeCompare(b.name));
-      
+
       return {
         grouped: true,
-        categories
+        categories: Object.keys(categoriesMap)
+          .sort((a, b) => a.localeCompare(b)) // Sort category names alphabetically
+          .map(name => ({
+            name,
+            items: categoriesMap[name].sort((a, b) => a.title.localeCompare(b.title)), // Sort items within each category by title
+          })),
       };
+    } else {
+      // Flat list for Connectors tab, or when search is active, or when sortType is 'name'.
+      // In all these flat list scenarios, sort by title.
+      const sortedItems = [...currentItemsToProcess].sort((a, b) => {
+        return a.title.localeCompare(b.title);
+      });
+      return { grouped: false, items: sortedItems };
     }
-  }, [libraryItems, searchQuery, sortType, activeTab]);
+  }, [items, searchQuery, sortType, activeTab, getItemCategory]);
 
   // Using shared icon color utility
   
@@ -821,9 +854,27 @@ export const LibraryModal: React.FC<LibraryModalProps> = ({ open, onOpenChange, 
   };
 
   const handleInstall = (itemId: string) => {
-    // This would be implemented to actually install the connector
-    console.log(`Installing item with ID: ${itemId}`);
-    // In a real implementation, this would call an API to install the item
+    const updatedItem = dataService.installLibraryItem(itemId);
+    if (updatedItem) {
+      setItems(prevItems => prevItems.map(item => item.id === itemId ? updatedItem : item));
+      if (selectedItem && selectedItem.id === itemId) {
+        setSelectedItem(updatedItem);
+      }
+    } else {
+      console.error(`[LibraryModal] Failed to install item with ID: ${itemId}. Item not found or error in dataService.`);
+    }
+  };
+
+  const handleUninstall = (itemId: string) => {
+    const updatedItem = dataService.uninstallLibraryItem(itemId);
+    if (updatedItem) {
+      setItems(prevItems => prevItems.map(item => item.id === itemId ? updatedItem : item));
+      if (selectedItem && selectedItem.id === itemId) {
+        setSelectedItem(updatedItem);
+      }
+    } else {
+      console.error(`[LibraryModal] Failed to uninstall item with ID: ${itemId}. Item not found or error in dataService.`);
+    }
   };
   
   // Function to handle card click
@@ -888,10 +939,7 @@ export const LibraryModal: React.FC<LibraryModalProps> = ({ open, onOpenChange, 
               {selectedItem.isInstalled ? (
                 <Button 
                   appearance="secondary"
-                  onClick={() => {
-                    console.log('Uninstall module:', selectedItem.id);
-                    // Implement uninstall functionality
-                  }}
+                  onClick={() => handleUninstall(selectedItem.id)}
                 >
                   Uninstall
                 </Button>
@@ -904,7 +952,7 @@ export const LibraryModal: React.FC<LibraryModalProps> = ({ open, onOpenChange, 
                     handleInstall(selectedItem.id);
                   }}
                 >
-                  Install module
+                  Install
                 </Button>
               )}
             </div>

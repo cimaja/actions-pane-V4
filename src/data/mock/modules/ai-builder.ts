@@ -8,7 +8,6 @@ export const module: ActionGroup = {
   iconColor: 'blue',
   tags: ['AI/ML', 'Integration', 'Automation'], // Category tag for this module
   category: 'Integration',  author: 'Microsoft',
-
   items: [], // This will be populated with references to the actions
   isInstalled: true // Module is installed by default
 };

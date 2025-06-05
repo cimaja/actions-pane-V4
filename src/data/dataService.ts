@@ -2,20 +2,44 @@ import { ActionGroup, LibraryItemType, TabType, LibraryCategoryType, DetailedAct
 import * as moduleFiles from './mock/modules';
 import { ActionItemType } from '../models/types';
 import * as connectorFiles from './mock/connectors';
+import { getLocalStorage, setLocalStorage } from '../utils/storage';
 
 /**
  * DataService provides a centralized access point for all mock data in the application.
  * It includes methods for retrieving, filtering, and searching data across all categories.
  */
 export class DataService {
+  private listeners: Array<() => void> = [];
   // Cache for modules and connectors
   private _modules: ActionGroup[] = [];
   private _connectors: LibraryItemType[] = [];
   private _moduleActions: DetailedActionItem[] = [];
   private _connectorActions: DetailedActionItem[] = [];
 
+  // Storage keys for installation state
+  private readonly INSTALLED_MODULES_KEY = 'installed_modules';
+  private readonly INSTALLED_CONNECTORS_KEY = 'installed_connectors';
+
+  public subscribe(listener: () => void): () => void {
+    this.listeners.push(listener);
+    return () => { // Return an unsubscribe function
+      this.listeners = this.listeners.filter(l => l !== listener);
+    };
+  }
+
+  private notifyListeners(): void {
+    this.listeners.forEach(listener => {
+      try {
+        listener();
+      } catch (error) {
+        console.error("Error in DataService listener:", error);
+      }
+    });
+  }
+
   constructor() {
     this.initializeData();
+    this.loadInstallationState(); // Load persisted state
   }
 
   /**
@@ -49,6 +73,81 @@ export class DataService {
     this._connectorActions = Object.values(connectorFiles).flatMap(connectorFile => 
       connectorFile.actions || []
     );
+  }
+
+  /**
+   * Load installation state from localStorage and update module and connector objects.
+   * Ensures that isInstalled defaults to false if not found in localStorage.
+   */
+  private loadInstallationState(): void {
+    let shouldSaveInitialState = false;
+    let finalModuleIds: string[] = [];
+    let finalConnectorIds: string[] = [];
+
+    try {
+      // Check for existing module installation state in localStorage
+      const rawModulesState = localStorage.getItem(this.INSTALLED_MODULES_KEY);
+      if (rawModulesState === null) {
+        // No state in localStorage, derive from mock data (initial load)
+        finalModuleIds = this._modules.filter(m => m.isInstalled).map(m => m.id);
+        shouldSaveInitialState = true;
+      } else {
+        // State exists in localStorage, parse it
+        finalModuleIds = getLocalStorage<string[]>(this.INSTALLED_MODULES_KEY, []);
+      }
+
+      // Check for existing connector installation state in localStorage
+      const rawConnectorsState = localStorage.getItem(this.INSTALLED_CONNECTORS_KEY);
+      if (rawConnectorsState === null) {
+        // No state in localStorage, derive from mock data (initial load)
+        finalConnectorIds = this._connectors.filter(c => c.isInstalled).map(c => c.id);
+        shouldSaveInitialState = true;
+      } else {
+        // State exists in localStorage, parse it
+        finalConnectorIds = getLocalStorage<string[]>(this.INSTALLED_CONNECTORS_KEY, []);
+      }
+
+      // Apply the determined installation state
+      this._modules.forEach(module => {
+        module.isInstalled = finalModuleIds.includes(module.id);
+      });
+      this._connectors.forEach(connector => {
+        connector.isInstalled = finalConnectorIds.includes(connector.id);
+      });
+
+      // If we derived initial state from mocks, save it back to localStorage
+      if (shouldSaveInitialState) {
+        this.saveInstallationState();
+      }
+
+    } catch (error) {
+      console.error('Failed to load or initialize installation state:', error);
+      // Default all to not installed and try to clear potentially corrupt localStorage entries
+      this._modules.forEach(module => { module.isInstalled = false; });
+      this._connectors.forEach(connector => { connector.isInstalled = false; });
+      try {
+        localStorage.removeItem(this.INSTALLED_MODULES_KEY);
+        localStorage.removeItem(this.INSTALLED_CONNECTORS_KEY);
+      } catch (removeError) {
+        console.error('Failed to clear localStorage keys after error:', removeError);
+      }
+    }
+  }
+  
+  /**
+   * Save the current installation state to localStorage.
+   */
+  private saveInstallationState(): void {
+    try {
+      const installedModules = this._modules.filter(m => m.isInstalled).map(m => m.id);
+      setLocalStorage(this.INSTALLED_MODULES_KEY, installedModules);
+      
+      const installedConnectors = this._connectors.filter(c => c.isInstalled).map(c => c.id);
+      setLocalStorage(this.INSTALLED_CONNECTORS_KEY, installedConnectors);
+    this.notifyListeners(); // Notify subscribers of the change
+    } catch (error) {
+      console.error('Failed to save installation state:', error);
+    }
   }
 
   // MODULES AND ACTIONS
@@ -294,6 +393,82 @@ export class DataService {
       ...this.searchConnectors(query),
       // Add other searches when implemented
     ];
+  }
+
+  /**
+   * Install a library item (module or connector).
+   * @param itemId The ID of the item to install.
+   * @returns The updated item with isInstalled=true, or undefined if not found.
+   */
+  installLibraryItem(itemId: string): LibraryItemType | undefined {
+    const moduleIndex = this._modules.findIndex(module => module.id === itemId);
+    if (moduleIndex !== -1) {
+      this._modules[moduleIndex].isInstalled = true;
+      this.saveInstallationState();
+      const module = this._modules[moduleIndex];
+      // Map ActionGroup to LibraryItemType for consistency
+      return {
+        id: module.id,
+        title: module.title,
+        type: 'built-in', // Assuming modules are 'built-in' type in library context
+        icon: module.icon,
+        iconColor: module.iconColor,
+        tags: module.tags,
+        category: module.category,
+        author: module.author,
+        description: '', // ActionGroup itself doesn't have a top-level description; specific items do.
+        isInstalled: true,
+        actions: module.items, // ActionGroup.items are DetailedActionItem[]
+      };
+    }
+    
+    const connectorIndex = this._connectors.findIndex(connector => connector.id === itemId);
+    if (connectorIndex !== -1) {
+      this._connectors[connectorIndex].isInstalled = true;
+      this.saveInstallationState();
+      return this._connectors[connectorIndex];
+    }
+    
+    console.warn(`[DataService] Item with ID ${itemId} not found for installation.`);
+    return undefined;
+  }
+
+  /**
+   * Uninstall a library item (module or connector).
+   * @param itemId The ID of the item to uninstall.
+   * @returns The updated item with isInstalled=false, or undefined if not found.
+   */
+  uninstallLibraryItem(itemId: string): LibraryItemType | undefined {
+    const moduleIndex = this._modules.findIndex(module => module.id === itemId);
+    if (moduleIndex !== -1) {
+      this._modules[moduleIndex].isInstalled = false;
+      this.saveInstallationState();
+      const module = this._modules[moduleIndex];
+      // Map ActionGroup to LibraryItemType for consistency
+      return {
+        id: module.id,
+        title: module.title,
+        type: 'built-in',
+        icon: module.icon,
+        iconColor: module.iconColor,
+        tags: module.tags,
+        category: module.category,
+        author: module.author,
+        description: '', // ActionGroup itself doesn't have a top-level description; specific items do.
+        isInstalled: false,
+        actions: module.items,
+      };
+    }
+    
+    const connectorIndex = this._connectors.findIndex(connector => connector.id === itemId);
+    if (connectorIndex !== -1) {
+      this._connectors[connectorIndex].isInstalled = false;
+      this.saveInstallationState();
+      return this._connectors[connectorIndex];
+    }
+    
+    console.warn(`[DataService] Item with ID ${itemId} not found for uninstallation.`);
+    return undefined;
   }
   
   // ACTIONS PANE CONTENT
