@@ -45,7 +45,8 @@ export type ModuleCategory =
   | 'Logic' 
   | 'Scripting' 
   | 'System'
-  | 'Connectors';
+  | 'Connectors'
+  | 'Custom actions';
 
 // Connector categories
 export type ConnectorCategory = 
@@ -74,11 +75,29 @@ export interface LibraryItemType {
   isInstalled: boolean;
   dependencies?: string[];
   itemCount?: number; // For UI Collections
+  sizeMB?: number; // Size in megabytes, added for custom actions
   actions?: ActionItemType[]; // For modules and connectors
 }
 
 // Tab type definition
 export type TabType = 'All' | 'Built-in' | 'Connectors' | 'Favorites';
+
+// Custom Action Item type definition
+export interface CustomActionItemType {
+  id: string;
+  title: string;
+  type: 'custom'; // To distinguish from other library items
+  icon: string; // Default to 'PuzzlePiece20Regular' or similar
+  iconColor: string; // Default to 'purple'
+  author: string;
+  description?: string;
+  isInstalled: boolean;
+  actions?: ActionItemType[]; // Optional list of actions, similar to modules
+  lastUpdated?: string; // e.g., 'YYYY-MM-DD'
+  sizeMB?: number; // Size in megabytes
+  // Potentially add fields for action definition/parameters later if needed
+  // For now, a custom action is a single invokable unit.
+}
 
 // Library category type definition
 export type LibraryCategoryType = 'Built-in' | 'Connectors' | 'Custom actions' | 'UI collections' | 'Templates';

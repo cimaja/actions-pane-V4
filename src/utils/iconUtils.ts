@@ -41,7 +41,20 @@ import {
   WindowSettings20Regular,
   WindowConsole20Regular,
   BrainCircuit24Regular,
-  Organization24Regular
+  Organization24Regular,
+  PuzzlePiece20Regular, // Added for custom actions
+  Settings20Regular,
+  MailMultiple20Regular,
+  DocumentText20Regular,
+  FolderOpen20Regular,
+  CalendarClock20Regular,
+  PlayCircle20Regular,
+  Chat20Regular, // Already have Chat24Regular, adding 20 for specificity if needed
+  Channel20Regular, // Already have Channel24Regular, adding 20 for specificity if needed
+  Send20Regular,
+  ArrowUpload20Regular,
+  ArrowSyncCircle20Regular,
+  Eye20Regular
 } from '@fluentui/react-icons';
 import { Word24Regular } from '../components/Library/WordIcon';
 import { Excel24Regular } from '../components/Library/ExcelIcon';
@@ -67,6 +80,23 @@ type IconComponent = React.FC<React.SVGProps<SVGSVGElement>>;
 const iconMap: Record<string, IconComponent> = {
   // Default icon
   default: Cube24Regular,
+
+  // Custom Actions
+  PuzzlePiece20Regular: PuzzlePiece20Regular,
+
+  // Icons for Custom Action sub-actions
+  Settings20Regular: Settings20Regular,
+  MailMultiple20Regular: MailMultiple20Regular,
+  DocumentText20Regular: DocumentText20Regular,
+  FolderOpen20Regular: FolderOpen20Regular,
+  CalendarClock20Regular: CalendarClock20Regular,
+  PlayCircle20Regular: PlayCircle20Regular,
+  Chat20Regular: Chat20Regular,
+  Channel20Regular: Channel20Regular,
+  Send20Regular: Send20Regular,
+  ArrowUpload20Regular: ArrowUpload20Regular,
+  ArrowSyncCircle20Regular: ArrowSyncCircle20Regular,
+  Eye20Regular: Eye20Regular,
 
   // Email & Communication
   mail: Mail24Regular,

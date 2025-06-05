@@ -67,7 +67,7 @@ import {
   ChevronLeft24Regular
 } from '@fluentui/react-icons';
 import { dataService } from '../../data/dataService';
-import { LibraryItemType, LibraryCategoryType } from '../../models/types';
+import { LibraryItemType, LibraryCategoryType, CustomActionItemType } from '../../models/types';
 import { MailShield24Regular } from './MailShieldIcon';
 import { ArrowCircleDownUp24Regular } from './ArrowCircleDownUpIcon';
 import { AIBuilder24Regular } from './AIBuilderIcon';
@@ -199,6 +199,12 @@ const useStyles = makeStyles({
     '@media (max-width: 768px)': {
       alignItems: 'center',
     },
+  },
+  metadataRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: tokens.spacingHorizontalS,
+    lineHeight: '16px',
   },
   detailsRightCTA: {
     display: 'flex',
@@ -681,7 +687,13 @@ export const LibraryModal: React.FC<LibraryModalProps> = ({ open, onOpenChange, 
   const styles = useStyles();
   const [activeTab, setActiveTab] = useState<LibraryCategoryType>('Built-in');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [sortType, setSortType] = useState<'name' | 'category'>('category');
+  const [sortTypes, setSortTypes] = useState<Record<LibraryCategoryType, 'name' | 'category' | 'lastUpdated'>>({
+    'Built-in': 'category',
+    'Connectors': 'category',
+    'Custom actions': 'lastUpdated', // Default for custom actions
+    'UI collections': 'category', // Assuming default, adjust if needed
+    'Templates': 'category',      // Assuming default, adjust if needed
+  });
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<LibraryItemType | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'details'>('list');
@@ -718,6 +730,15 @@ export const LibraryModal: React.FC<LibraryModalProps> = ({ open, onOpenChange, 
       const fetchedItems = dataService.getLibraryItemsByCategory(activeTab);
       setItems(fetchedItems);
       setIsLoading(false);
+
+      // Ensure 'Custom actions' tab doesn't use 'category' sort.
+      // If its current sort type is 'category', reset to 'lastUpdated' or 'name'.
+      if (activeTab === 'Custom actions' && sortTypes[activeTab] === 'category') {
+        setSortTypes(prevSortTypes => ({
+          ...prevSortTypes,
+          [activeTab]: 'lastUpdated', // Or 'name' as a primary default
+        }));
+      }
     } else {
       setItems([]); // Clear items when modal is closed
       setViewMode('list'); // Reset to list view when closed
@@ -767,9 +788,12 @@ export const LibraryModal: React.FC<LibraryModalProps> = ({ open, onOpenChange, 
     }
   }, [open, initialCategory, initialItemId, getAllLibraryItems, getItemCategory]);
 
-  // Set sort type handler
-  const setSortTypeHandler = (type: 'name' | 'category') => {
-    setSortType(type);
+  // Set sort type handler for the current active tab
+  const setSortTypeHandler = (type: 'name' | 'category' | 'lastUpdated') => {
+    setSortTypes(prevSortTypes => ({
+      ...prevSortTypes,
+      [activeTab]: type,
+    }));
   };
 
   // Note: libraryItems variable is removed; use `items` state directly for processedItems.
@@ -781,7 +805,8 @@ export const LibraryModal: React.FC<LibraryModalProps> = ({ open, onOpenChange, 
 
   // Process items based on search query and sort type
   const processedItems = useMemo<ProcessedItems>(() => {
-    let currentItemsToProcess = [...items]; // Start with a copy of items from state
+    const currentSortSetting = sortTypes[activeTab];
+    let currentItemsToProcess = [...items];
 
     // Apply search filter if query exists
     if (searchQuery) {
@@ -792,35 +817,82 @@ export const LibraryModal: React.FC<LibraryModalProps> = ({ open, onOpenChange, 
     }
 
     // Apply sorting and grouping
-    if (sortType === 'category' && activeTab !== 'Connectors' && !searchQuery) {
-      // Group by category if not searching, not on Connectors tab, and sortType is category
-      const categoriesMap: { [key: string]: LibraryItemType[] } = {};
-      currentItemsToProcess.forEach(item => {
-        const categoryName = getItemCategory(item); // Ensure getItemCategory is defined above or memoized
-        if (!categoriesMap[categoryName]) {
-          categoriesMap[categoryName] = [];
-        }
-        categoriesMap[categoryName].push(item);
-      });
+    if (currentSortSetting === 'category' && !searchQuery) {
+      if (activeTab === 'Connectors') {
+        // Special grouping for Connectors tab: Microsoft and Third party
+        const microsoftItems: LibraryItemType[] = [];
+        const thirdPartyItems: LibraryItemType[] = [];
 
+        currentItemsToProcess.forEach(item => {
+          if (item.category === 'Microsoft') {
+            microsoftItems.push(item);
+          } else {
+            // All other connectors (including 'Third party' or any other category string)
+            thirdPartyItems.push(item);
+          }
+        });
+
+        // Sort items within each group by title
+        microsoftItems.sort((a, b) => a.title.localeCompare(b.title));
+        thirdPartyItems.sort((a, b) => a.title.localeCompare(b.title));
+
+        const categoriesToShow = [];
+        if (microsoftItems.length > 0) {
+          categoriesToShow.push({ name: 'Microsoft', items: microsoftItems });
+        }
+        if (thirdPartyItems.length > 0) {
+          categoriesToShow.push({ name: 'Third party', items: thirdPartyItems });
+        }
+        
+        return {
+          grouped: true,
+          categories: categoriesToShow,
+        };
+
+      } else {
+        // Group by general category for other tabs (Built-in, Custom actions, etc.)
+        const categoriesMap: { [key: string]: LibraryItemType[] } = {};
+        currentItemsToProcess.forEach(item => {
+          const categoryName = getItemCategory(item);
+          if (!categoriesMap[categoryName]) {
+            categoriesMap[categoryName] = [];
+          }
+          categoriesMap[categoryName].push(item);
+        });
+
+        return {
+          grouped: true,
+          categories: Object.keys(categoriesMap)
+            .sort((a, b) => a.localeCompare(b)) // Sort category names alphabetically
+            .map(name => ({
+              name,
+              items: categoriesMap[name].sort((a, b) => a.title.localeCompare(b.title)), // Sort items within each category by title
+            })),
+        };
+      }
+    } else { // Handles sortType 'name', 'lastUpdated', or when searchQuery is active
+      if (activeTab === 'Custom actions' && !searchQuery) {
+        if (currentSortSetting === 'lastUpdated') {
+          currentItemsToProcess.sort((a, b) => {
+            const dateA = (a as CustomActionItemType).lastUpdated;
+            const dateB = (b as CustomActionItemType).lastUpdated;
+            if (!dateA && !dateB) return 0;
+            if (!dateA) return 1; // items without date go last (or use -1 depending on desired behavior for nulls)
+            if (!dateB) return -1; // items without date go last
+            return dateB.localeCompare(dateA); // Descending order for dates
+          });
+        } else { // Default to sort by name for Custom actions if not 'lastUpdated' (i.e., sortType === 'name')
+          currentItemsToProcess.sort((a, b) => a.title.localeCompare(b.title));
+        }
+      } else { // Default sort for other tabs or when search is active (usually by name)
+        currentItemsToProcess.sort((a, b) => a.title.localeCompare(b.title));
+      }
       return {
-        grouped: true,
-        categories: Object.keys(categoriesMap)
-          .sort((a, b) => a.localeCompare(b)) // Sort category names alphabetically
-          .map(name => ({
-            name,
-            items: categoriesMap[name].sort((a, b) => a.title.localeCompare(b.title)), // Sort items within each category by title
-          })),
+        grouped: false,
+        items: currentItemsToProcess,
       };
-    } else {
-      // Flat list for Connectors tab, or when search is active, or when sortType is 'name'.
-      // In all these flat list scenarios, sort by title.
-      const sortedItems = [...currentItemsToProcess].sort((a, b) => {
-        return a.title.localeCompare(b.title);
-      });
-      return { grouped: false, items: sortedItems };
     }
-  }, [items, searchQuery, sortType, activeTab, getItemCategory]);
+  }, [items, searchQuery, sortTypes, activeTab, getItemCategory]);
 
   // Using shared icon color utility
   
@@ -931,6 +1003,23 @@ export const LibraryModal: React.FC<LibraryModalProps> = ({ open, onOpenChange, 
                 >
                   {selectedItem.author || 'Unknown author'}
                 </Text>
+                {(selectedItem.lastUpdated || selectedItem.sizeMB) && (
+                  <div className={styles.metadataRow}>
+                    {selectedItem.lastUpdated && (
+                      <Text size={200} style={{ color: tokens.colorNeutralForeground3 }}>
+                        Updated: {selectedItem.lastUpdated}
+                      </Text>
+                    )}
+                    {selectedItem.lastUpdated && selectedItem.sizeMB && (
+                      <span style={{ margin: '0 4px', color: tokens.colorNeutralForeground3 }}>•</span>
+                    )}
+                    {selectedItem.sizeMB && (
+                      <Text size={200} style={{ color: tokens.colorNeutralForeground3 }}>
+                        Size: {selectedItem.sizeMB}MB
+                      </Text>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
             
@@ -1062,20 +1151,23 @@ export const LibraryModal: React.FC<LibraryModalProps> = ({ open, onOpenChange, 
               <div className={styles.columnHeader}>
                 {/* Sort options - show more options for Built-in category */}
                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                  {(activeTab === 'Built-in' || activeTab === 'Connectors') && (
+                  {(activeTab === 'Built-in' || activeTab === 'Connectors' || activeTab === 'Custom actions') && (
                     <Dropdown
-                      value={sortType === 'name' ? 'Name' : 'Category'}
+                      value={sortTypes[activeTab] === 'lastUpdated' ? 'Last updated' : (sortTypes[activeTab] === 'name' ? 'Name' : 'Category')}
                       onOptionSelect={(_, data) => {
                         if (data.optionValue === 'Name') {
                           setSortTypeHandler('name');
                         } else if (data.optionValue === 'Category') {
                           setSortTypeHandler('category');
+                        } else if (data.optionValue === 'Last updated') {
+                          setSortTypeHandler('lastUpdated');
                         }
                       }}
                       style={{ minWidth: '120px' }}
                     >
                       <Option value="Name">Name</Option>
-                      <Option value="Category">Category</Option>
+                      {activeTab !== 'Custom actions' && <Option value="Category">Category</Option>}
+                      {activeTab === 'Custom actions' && <Option value="Last updated">Last updated</Option>}
                     </Dropdown>
                   )}
                 </div>

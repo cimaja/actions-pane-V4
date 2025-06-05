@@ -1,7 +1,8 @@
-import { ActionGroup, LibraryItemType, TabType, LibraryCategoryType, DetailedActionItem, ModuleCategory } from '../models/types';
+import { ActionGroup, LibraryItemType, TabType, LibraryCategoryType, DetailedActionItem, ModuleCategory, CustomActionItemType } from '../models/types';
 import * as moduleFiles from './mock/modules';
 import { ActionItemType } from '../models/types';
 import * as connectorFiles from './mock/connectors';
+import * as customActionFiles from './mock/customActions';
 import { getLocalStorage, setLocalStorage } from '../utils/storage';
 
 /**
@@ -15,10 +16,12 @@ export class DataService {
   private _connectors: LibraryItemType[] = [];
   private _moduleActions: DetailedActionItem[] = [];
   private _connectorActions: DetailedActionItem[] = [];
+  private _customActions: CustomActionItemType[] = [];
 
   // Storage keys for installation state
   private readonly INSTALLED_MODULES_KEY = 'installed_modules';
   private readonly INSTALLED_CONNECTORS_KEY = 'installed_connectors';
+  private readonly INSTALLED_CUSTOM_ACTIONS_KEY = 'installed_custom_actions';
 
   public subscribe(listener: () => void): () => void {
     this.listeners.push(listener);
@@ -73,6 +76,9 @@ export class DataService {
     this._connectorActions = Object.values(connectorFiles).flatMap(connectorFile => 
       connectorFile.actions || []
     );
+
+    // Initialize custom actions
+    this._customActions = Object.values(customActionFiles) as CustomActionItemType[];
   }
 
   /**
@@ -83,6 +89,7 @@ export class DataService {
     let shouldSaveInitialState = false;
     let finalModuleIds: string[] = [];
     let finalConnectorIds: string[] = [];
+    let finalCustomActionIds: string[] = [];
 
     try {
       // Check for existing module installation state in localStorage
@@ -107,12 +114,26 @@ export class DataService {
         finalConnectorIds = getLocalStorage<string[]>(this.INSTALLED_CONNECTORS_KEY, []);
       }
 
+      // Check for existing custom action installation state in localStorage
+      const rawCustomActionsState = localStorage.getItem(this.INSTALLED_CUSTOM_ACTIONS_KEY);
+      if (rawCustomActionsState === null) {
+        // No state in localStorage, derive from mock data (initial load)
+        finalCustomActionIds = this._customActions.filter(ca => ca.isInstalled).map(ca => ca.id);
+        shouldSaveInitialState = true;
+      } else {
+        // State exists in localStorage, parse it
+        finalCustomActionIds = getLocalStorage<string[]>(this.INSTALLED_CUSTOM_ACTIONS_KEY, []);
+      }
+
       // Apply the determined installation state
       this._modules.forEach(module => {
         module.isInstalled = finalModuleIds.includes(module.id);
       });
       this._connectors.forEach(connector => {
         connector.isInstalled = finalConnectorIds.includes(connector.id);
+      });
+      this._customActions.forEach(action => {
+        action.isInstalled = finalCustomActionIds.includes(action.id);
       });
 
       // If we derived initial state from mocks, save it back to localStorage
@@ -125,15 +146,129 @@ export class DataService {
       // Default all to not installed and try to clear potentially corrupt localStorage entries
       this._modules.forEach(module => { module.isInstalled = false; });
       this._connectors.forEach(connector => { connector.isInstalled = false; });
+      this._customActions.forEach(action => { action.isInstalled = false; });
       try {
         localStorage.removeItem(this.INSTALLED_MODULES_KEY);
         localStorage.removeItem(this.INSTALLED_CONNECTORS_KEY);
+        localStorage.removeItem(this.INSTALLED_CUSTOM_ACTIONS_KEY);
       } catch (removeError) {
         console.error('Failed to clear localStorage keys after error:', removeError);
       }
     }
   }
   
+  /**
+   * Clears all known application-specific keys from localStorage.
+   */
+  public clearAllApplicationCache(): void {
+    try {
+      localStorage.removeItem(this.INSTALLED_MODULES_KEY);
+      localStorage.removeItem(this.INSTALLED_CONNECTORS_KEY);
+      localStorage.removeItem(this.INSTALLED_CUSTOM_ACTIONS_KEY);
+      localStorage.removeItem('favorite_actions');
+      // Potentially add other keys if they are managed by DataService or globally known
+      console.log('Application cache (modules, connectors, custom actions, favorites) cleared from localStorage.');
+      // Re-initialize data to mock defaults
+      this.initializeData();
+      // Load installation state. Since localStorage is empty for these keys,
+      // it will apply the defaults from the just-initialized data and save them back to localStorage.
+      this.loadInstallationState();
+
+      // Notify listeners to refresh UI
+      this.notifyListeners();
+    } catch (error) {
+      console.error('Error clearing application cache from localStorage:', error);
+    }
+  }
+
+  /**
+   * Clears all installed 'Built-in' modules (sets their isInstalled to false).
+   * This refers to items categorized as 'Built-in' in the library.
+   */
+  public clearInstalledModules(): void {
+    try {
+      this._modules.forEach(module => { module.isInstalled = false; });
+      this.saveInstallationState(); // Persists and notifies
+      // console.log('Installed modules cleared.'); // Optional: for debugging
+    } catch (error) {
+      console.error('Error clearing installed modules:', error);
+    }
+  }
+
+  /**
+   * Clears all installed connectors (sets their isInstalled to false).
+   */
+  public clearInstalledConnectors(): void {
+    try {
+      this._connectors.forEach(connector => { connector.isInstalled = false; });
+      this.saveInstallationState(); // Persists and notifies
+      // console.log('Installed connectors cleared.'); // Optional: for debugging
+    } catch (error) {
+      console.error('Error clearing installed connectors:', error);
+    }
+  }
+
+  /**
+   * Clears all installed custom actions (sets their isInstalled to false).
+   */
+  public clearInstalledCustomActions(): void {
+    try {
+      this._customActions.forEach(action => { action.isInstalled = false; });
+      this.saveInstallationState(); // Persists and notifies
+      // console.log('Installed custom actions cleared.'); // Optional: for debugging
+    } catch (error) {
+      console.error('Error clearing installed custom actions:', error);
+    }
+  }
+
+  /**
+   * Clears all favorited items.
+   */
+  public clearAllFavorites(): void {
+    try {
+      localStorage.removeItem('favorite_actions');
+      // console.log('Favorites cleared.'); // Optional: for debugging
+      this.notifyListeners(); // Notify UI to update favorite states
+    } catch (error) {
+      console.error('Error clearing favorites from localStorage:', error);
+    }
+  }
+
+  /**
+   * Clears all user-selected installed built-in modules, connectors, and all favorites.
+   * This effectively uninstalls all built-in modules and connectors and clears favorites,
+   * without affecting custom actions or resetting the entire application to mock defaults.
+   */
+  public clearUserSelections(): void {
+    try {
+      // Clear installed built-in modules
+      this._modules.forEach(module => { module.isInstalled = false; });
+      // console.log('Installed modules cleared.');
+
+      // Clear installed connectors
+      this._connectors.forEach(connector => { connector.isInstalled = false; });
+      // console.log('Installed connectors cleared.');
+
+      // Persist changes to modules and connectors installation state
+      this.saveInstallationState(); // This also calls notifyListeners
+
+      // Clear all favorites
+      localStorage.removeItem('favorite_actions');
+      // console.log('Favorites cleared.');
+
+      // Explicitly notify listeners again in case saveInstallationState's notification
+      // doesn't cover all aspects or if favorites need a separate update signal.
+      // However, saveInstallationState already calls notifyListeners, so this might be redundant
+      // unless favorites state is managed entirely separately from installation state listeners.
+      // For now, relying on saveInstallationState's notification.
+      // If favorites UI doesn't update, uncomment the line below or ensure favorites update is handled.
+      // this.notifyListeners(); 
+      console.log('User selections (installed modules, connectors, favorites) cleared.');
+    } catch (error) {
+      console.error('Error clearing user selections:', error);
+    }
+  }
+
   /**
    * Save the current installation state to localStorage.
    */
@@ -144,6 +279,9 @@ export class DataService {
       
       const installedConnectors = this._connectors.filter(c => c.isInstalled).map(c => c.id);
       setLocalStorage(this.INSTALLED_CONNECTORS_KEY, installedConnectors);
+
+      const installedCustomActions = this._customActions.filter(ca => ca.isInstalled).map(ca => ca.id);
+      setLocalStorage(this.INSTALLED_CUSTOM_ACTIONS_KEY, installedCustomActions);
     this.notifyListeners(); // Notify subscribers of the change
     } catch (error) {
       console.error('Failed to save installation state:', error);
@@ -367,7 +505,7 @@ export class DataService {
           actions: this._connectorActions.filter(action => action.moduleId === connector.id)
         }));
       case 'Custom actions':
-        return []; // To be implemented
+        return this._customActions.map(ca => ca as LibraryItemType); // Return loaded custom actions
       case 'UI collections':
         return []; // To be implemented
       case 'Templates':
@@ -429,6 +567,13 @@ export class DataService {
       return this._connectors[connectorIndex];
     }
     
+    const customActionIndex = this._customActions.findIndex(action => action.id === itemId);
+    if (customActionIndex !== -1) {
+      this._customActions[customActionIndex].isInstalled = true;
+      this.saveInstallationState();
+      return this._customActions[customActionIndex] as LibraryItemType;
+    }
+    
     console.warn(`[DataService] Item with ID ${itemId} not found for installation.`);
     return undefined;
   }
@@ -467,20 +612,58 @@ export class DataService {
       return this._connectors[connectorIndex];
     }
     
+    const customActionIndex = this._customActions.findIndex(action => action.id === itemId);
+    if (customActionIndex !== -1) {
+      this._customActions[customActionIndex].isInstalled = false;
+      this.saveInstallationState();
+      return this._customActions[customActionIndex] as LibraryItemType;
+    }
+    
     console.warn(`[DataService] Item with ID ${itemId} not found for uninstallation.`);
     return undefined;
   }
   
   // ACTIONS PANE CONTENT
   
+  private getInstalledCustomActionItemsForPane(): ActionGroup[] {
+    return this._customActions
+      .filter(ca => ca.isInstalled)
+      .map(ca => {
+        // Map the sub-actions of the custom action package to DetailedActionItem
+        const subActions: DetailedActionItem[] = (ca.actions || []).map(action => ({
+          id: action.id,
+          title: action.title,
+          icon: action.icon,
+          iconColor: action.iconColor,
+          moduleId: ca.id, // Parent custom action package ID
+          moduleTitle: ca.title, // Parent custom action package title
+          // description: action.description, // Assuming sub-actions might have descriptions
+        }));
+
+        return {
+          id: ca.id,
+          title: ca.title,
+          icon: ca.icon,
+          iconColor: ca.iconColor,
+          category: 'Custom actions',
+          type: 'module', // Treat as a module for rendering purposes
+          isInstalled: true,
+          tags: ['custom'],
+          items: subActions, // Renamed from 'actions' to 'items' to match ActionGroup structure for pane
+          // subGroups: undefined, // Explicitly no sub-groups within a custom action package itself
+        };
+      });
+  }
+      
   /**
    * Get content for the Actions Pane based on active tab, search query, and favorites
    */
   getActionsPaneContent(activeTab: TabType, searchQuery: string, favoriteItems: Record<string, boolean> = {}): { modules: ActionGroup[], uninstalledCount?: number } {
+    let modules: ActionGroup[] = []; // Declare modules at the top
+    let uninstalledCountFromLogic: number | undefined; // Keep track of uninstalled count
+
     if (activeTab === 'Favorites') {
       const favoriteActions = this.getFavoriteActions(favoriteItems);
-      
-      // Group favorite actions by their module
       const groupedFavorites: { [key: string]: DetailedActionItem[] } = {};
       favoriteActions.forEach(action => {
         if (!groupedFavorites[action.moduleId]) {
@@ -488,13 +671,10 @@ export class DataService {
         }
         groupedFavorites[action.moduleId].push(action);
       });
-      
-      // Create ActionGroup objects for each module with favorites
-      const modules = Object.entries(groupedFavorites).map(([moduleId, items]) => {
-        // Look for module or connector to get proper title and icon
+
+      modules = Object.entries(groupedFavorites).map(([moduleId, items]) => {
         const module = this.getModuleById(moduleId);
         const connector = this.getConnectorById(moduleId);
-        
         // Use title from module or connector, with a friendly fallback if not found
         const title = module?.title || connector?.title || `Action Group (${moduleId})`;
         
@@ -521,119 +701,148 @@ export class DataService {
         
         return actionGroup;
       });
-      
-      return { modules };
-    }
-    
-    // Filter modules based on tab
-    let modules: ActionGroup[] = [];
-    if (activeTab === 'All') {
-      // Include both modules and connectors in the All tab
-      const displayModules = this.getDisplayModules().filter(module => 
-        !module.tags?.includes('connector')
-      );
-      
-      // Get connector modules in the 'Connectors' category
-      const connectorModules = this.getInstalledConnectors().map(connector => {
-        const connectorGroup: ActionGroup = {
-          id: connector.id,
-          title: connector.title,
-          icon: connector.icon,
-          items: this._connectorActions.filter(action => action.moduleId === connector.id),
-          tags: ['connector']
-        };
+      // Removed early return, flow continues to generic search filter below
+    } else {
+      // Original logic for non-Favorite tabs to populate 'modules'
+      // Filter modules based on tab
+      if (activeTab === 'All') {
+        // Include both modules and connectors in the All tab
+        const displayModules = this.getDisplayModules().filter(module => 
+          !module.tags?.includes('connector')
+        );
+        
+        // Get connector modules in the 'Connectors' category
+        const connectorModules = this.getInstalledConnectors().map(connector => {
+          const connectorGroup: ActionGroup = {
+            id: connector.id,
+            title: connector.title,
+            icon: connector.icon,
+            items: this._connectorActions.filter(action => action.moduleId === connector.id),
+            tags: ['connector'] // Ensure connectors have a 'connector' tag for filtering if needed
+          };
 
-        // Set category for connectors to 'Connectors'
-        connectorGroup.category = 'Connectors';
+          // Set category for connectors to 'Connectors'
+          connectorGroup.category = 'Connectors';
+          
+          return connectorGroup;
+        });
         
-        return connectorGroup;
-      });
-      
-      // Get integration modules (modules with category 'Integration')
-      const integrationModules = displayModules.filter(module => module.category === 'Integration');
-      
-      // Get other modules (excluding integrations)
-      const otherModules = displayModules.filter(module => module.category !== 'Integration');
-      
-      // Combine all modules with connectors at the end
-      modules = [...otherModules, ...integrationModules, ...connectorModules];
-    } else if (activeTab === 'Built-in') {
-      modules = this.getDisplayModules().filter(module => 
-        !module.tags?.includes('connector')
-      );
-    } else if (activeTab === 'Connectors') {
-      // Display connectors grouped by their categories
-      const connectorItems = this.getInstalledConnectors().map(connector => {
-        const connectorGroup: ActionGroup = {
-          id: connector.id,
-          title: connector.title,
-          icon: connector.icon,
-          items: this._connectorActions.filter(action => action.moduleId === connector.id),
-          tags: connector.tags || [],
-          // Use the connector's category if available, otherwise use 'Connectors' as default
-          category: (connector.category as ModuleCategory) || 'Connectors'
-        };
+        // Get integration modules (modules with category 'Integration')
+        const integrationModules = displayModules.filter(module => module.category === 'Integration');
         
-        return connectorGroup;
-      });
-      
-      // If sortOrder is 'category', we'll let the ActionsPaneContent component handle the grouping
-      // Otherwise, just return the connector items as is
-      modules = connectorItems;
+        // Get other modules (excluding integrations)
+        const otherModules = displayModules.filter(module => module.category !== 'Integration');
+        
+        // Combine all modules with connectors at the end
+        modules = [...otherModules, ...integrationModules, ...connectorModules];
+
+        // Add Custom Action groups (each installed custom action is its own group)
+        const installedCustomActionGroupsAll = this.getInstalledCustomActionItemsForPane();
+        if (installedCustomActionGroupsAll.length > 0) {
+          modules.push(...installedCustomActionGroupsAll);
+        }
+      } else if (activeTab === 'Built-in') {
+        modules = this.getDisplayModules().filter(module => 
+          !module.tags?.includes('connector') // Exclude items tagged as 'connector' from 'Built-in'
+        );
+
+        // Add Custom Action groups (each installed custom action is its own group)
+        const installedCustomActionGroupsBuiltIn = this.getInstalledCustomActionItemsForPane();
+        if (installedCustomActionGroupsBuiltIn.length > 0) {
+          modules.push(...installedCustomActionGroupsBuiltIn);
+        }
+      } else if (activeTab === 'Connectors') {
+        // Display connectors grouped by their categories
+        const connectorItems = this.getInstalledConnectors().map(connector => {
+          const connectorGroup: ActionGroup = {
+            id: connector.id,
+            title: connector.title,
+            icon: connector.icon,
+            items: this._connectorActions.filter(action => action.moduleId === connector.id),
+            tags: connector.tags || [],
+            // Use the connector's category if available, otherwise use 'Connectors' as default
+            category: (connector.category as ModuleCategory) || 'Connectors'
+          };
+          
+          return connectorGroup;
+        });
+        
+        // If sortOrder is 'category', we'll let the ActionsPaneContent component handle the grouping
+        // Otherwise, just return the connector items as is
+        modules = connectorItems;
+      }
     }
     
-    // Apply search filter if query exists
-    if (searchQuery) {
+    // Apply search filter if query exists and modules array is populated
+    if (searchQuery && modules.length > 0) {
       const normalizedQuery = searchQuery.toLowerCase();
       modules = modules.map(module => {
         // Filter items within each module
         const filteredItems = module.items.filter(item => 
           item.title.toLowerCase().includes(normalizedQuery) ||
-          item.description?.toLowerCase().includes(normalizedQuery) ||
-          item.tags?.some((tag: string) => tag.toLowerCase().includes(normalizedQuery))
+          (item.description && item.description.toLowerCase().includes(normalizedQuery)) ||
+          (item.tags && item.tags.some((tag: string) => tag.toLowerCase().includes(normalizedQuery)))
         );
         
         // Filter subgroups if they exist
         const filteredSubGroups = module.subGroups?.map(subGroup => {
           const filteredSubItems = subGroup.items.filter(item => 
             item.title.toLowerCase().includes(normalizedQuery) ||
-            item.description?.toLowerCase().includes(normalizedQuery) ||
-            item.tags?.some((tag: string) => tag.toLowerCase().includes(normalizedQuery))
+            (item.description && item.description.toLowerCase().includes(normalizedQuery)) ||
+            (item.tags && item.tags.some((tag: string) => tag.toLowerCase().includes(normalizedQuery)))
           );
           return { ...subGroup, items: filteredSubItems };
         }).filter(subGroup => subGroup.items.length > 0);
         
-        // Only include the module if it has matching items or subgroups
+        // Check if module title itself matches
+        const moduleTitleMatches = module.title.toLowerCase().includes(normalizedQuery);
+
+        // Only include the module if its title matches, or it has matching items or subgroups
         const hasMatchingItems = filteredItems.length > 0;
         const hasMatchingSubGroups = filteredSubGroups && filteredSubGroups.length > 0;
         
-        if (!hasMatchingItems && !hasMatchingSubGroups) {
+        if (!moduleTitleMatches && !hasMatchingItems && !hasMatchingSubGroups) {
           return null;
         }
         
         return { 
           ...module, 
-          items: filteredItems,
-          subGroups: filteredSubGroups
+          items: filteredItems, // Use filtered items
+          subGroups: filteredSubGroups // Use filtered subgroups
         };
       }).filter(Boolean) as ActionGroup[]; // Filter out null values and cast back to ActionGroup[]
     }
     
     // If there's a search query, count uninstalled items that match
-    let uninstalledCount;
+    // This count should be based on what's *not* in the currently displayed 'modules'
+    // but would appear if not filtered by installation status.
     if (searchQuery) {
-      const uninstalledModules = this.searchUninstalledModules(searchQuery);
-      const uninstalledActions = this.searchUninstalledActions(searchQuery);
+      // const allPossibleModulesForQuery: ActionGroup[] = [];
+      // Logic to get ALL modules/connectors/custom actions that could match query, irrespective of installed status
+      // For simplicity, we'll estimate based on searching uninstalled items directly.
+      // This part might need refinement if the count is critical for UI that shows "X uninstalled items match"
       
-      // Count unique modules/connectors that have matching uninstalled actions
-      const uniqueModuleIds = new Set<string>();
-      uninstalledActions.forEach(action => uniqueModuleIds.add(action.moduleId));
-      uninstalledModules.forEach(module => uniqueModuleIds.add(module.id));
+      const uninstalledModulesMatching = this.searchUninstalledModules(searchQuery);
+      const uninstalledActionsMatching = this.searchUninstalledActions(searchQuery);
       
-      uninstalledCount = uniqueModuleIds.size;
+      const uniqueUninstalledModuleIds = new Set<string>();
+      uninstalledActionsMatching.forEach(action => {
+        // Ensure the parent module/connector of this action is indeed uninstalled
+        const parentModule = this.getModuleById(action.moduleId);
+        const parentConnector = this.getConnectorById(action.moduleId);
+        if ((parentModule && parentModule.isInstalled === false) || (parentConnector && !parentConnector.isInstalled)) {
+          uniqueUninstalledModuleIds.add(action.moduleId);
+        }
+      });
+      uninstalledModulesMatching.forEach(module => {
+        if (module.isInstalled === false) { // Double check, searchUninstalledModules should already ensure this
+             uniqueUninstalledModuleIds.add(module.id);
+        }
+      });
+      uninstalledCountFromLogic = uniqueUninstalledModuleIds.size;
     }
     
-    return { modules, uninstalledCount };
+    return { modules, uninstalledCount: uninstalledCountFromLogic };
   }
 }
 
