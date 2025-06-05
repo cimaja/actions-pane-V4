@@ -326,6 +326,13 @@ export class DataService {
   }
   
   /**
+   * Get a custom action by its ID
+   */
+  getCustomActionById(id: string): CustomActionItemType | undefined {
+    return this._customActions.find(customAction => customAction.id === id);
+  }
+  
+  /**
    * Search modules by query
    * @param query The search query
    * @param installedOnly Whether to only include installed modules
@@ -430,8 +437,17 @@ export class DataService {
       return [...moduleActions, ...subGroupActions];
     });
     
-    // Combine with connector actions
-    const allActions = [...allModuleActions, ...this._connectorActions];
+    // Get custom action items
+    const customActionItems = this._customActions
+      .filter(ca => ca.isInstalled)
+      .flatMap(ca => (ca.actions || []).map(action => ({
+        ...action,
+        moduleId: ca.id,
+        moduleTitle: ca.title
+      })));
+    
+    // Combine with connector actions and custom actions
+    const allActions = [...allModuleActions, ...this._connectorActions, ...customActionItems];
     
     // Filter favorites
     return allActions.filter(action => favoriteItems[action.id]);
@@ -675,12 +691,14 @@ export class DataService {
       modules = Object.entries(groupedFavorites).map(([moduleId, items]) => {
         const module = this.getModuleById(moduleId);
         const connector = this.getConnectorById(moduleId);
-        // Use title from module or connector, with a friendly fallback if not found
-        const title = module?.title || connector?.title || `Action Group (${moduleId})`;
+        const customAction = this.getCustomActionById(moduleId);
         
-        // Use icon and iconColor from module or connector
-        const icon = module?.icon || connector?.icon;
-        const iconColor = module?.iconColor || connector?.iconColor;
+        // Use title from module, connector, or custom action with a friendly fallback
+        const title = module?.title || connector?.title || customAction?.title || `Action Group (${moduleId})`;
+        
+        // Use icon and iconColor from module, connector, or custom action
+        const icon = module?.icon || connector?.icon || customAction?.icon;
+        const iconColor = module?.iconColor || connector?.iconColor || customAction?.iconColor;
         
         // For Favorites tab, ensure we have a flat structure with no subGroups
         const actionGroup: ActionGroup = {

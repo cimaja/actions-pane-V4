@@ -63,7 +63,7 @@ const useStyles = makeStyles({
     height: '100%',
     width: '100%',
     boxSizing: 'border-box',
-    padding: `0 8px`, // Removed top/bottom padding, kept horizontal padding
+    padding: `0 8px 24px 8px`, // Added 24px bottom padding for improved scroll experience
     '&.empty': {
       overflow: 'visible',
       height: 'auto',
@@ -637,7 +637,8 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
   // Group items by category when sorting by category
   const groupedByCategory = useMemo(() => {
     // Only apply category grouping for All, Built-in, and Connectors tabs with category sorting
-    if (sortOrder !== 'category' || !['All', 'Built-in', 'Connectors'].includes(activeTab)) {
+    // AND when there's no active search query
+    if (searchQuery || sortOrder !== 'category' || !['All', 'Built-in', 'Connectors'].includes(activeTab)) {
       return null;
     }
     
@@ -744,8 +745,8 @@ const FavoritesHeader = ({ group, isFirst }: { group: ActionGroup, isFirst?: boo
 const renderGroup = (group: ActionGroup): JSX.Element => {
     const isExpanded = expandedGroups[group.id] === true;
 
-    // For the Favorites tab, render without accordion/expand-collapse functionality
-    if (activeTab === 'Favorites') {
+    // For Favorites tab OR when a search query is active, render without accordion/expand-collapse functionality
+    if (activeTab === 'Favorites' || searchQuery) {
       return (
         <div key={group.id} className={styles.groupContainer}>
           <div className={styles.expandableGroup}>
@@ -1094,9 +1095,71 @@ const renderGroup = (group: ActionGroup): JSX.Element => {
       // Otherwise show toggle as usual
       const toggleText = showUninstalledItems ? 'Hide library results' : `${filteredUninstalledCount} more results in the library`;
       
+      // When search is active, use a flat layout similar to Favorites tab
+      if (searchQuery) {
+        // For Connectors tab, we need to flatten the structure to match other tabs
+        let groupsToRender = [...installedGroups];
+        
+        // If we're in the Connectors tab and have results grouped by category,
+        // flatten the structure to ensure consistent rendering
+        if (activeTab === 'Connectors' && groupedByCategory) {
+          groupsToRender = [];
+          // Extract all individual connector groups from the category groups
+          groupedByCategory.forEach(({ groups }) => {
+            groupsToRender.push(...groups);
+          });
+        }
+        
+        // Process each group to move subgroup items to the parent group's items
+        groupsToRender = groupsToRender.map(group => {
+          // Create a new group with the same properties
+          const newGroup = { ...group };
+          
+          // If the group has subgroups, move all their items to the parent group's items
+          if (newGroup.subGroups && newGroup.subGroups.length > 0) {
+            // Create a new items array containing the parent items
+            const allItems = [...newGroup.items];
+            
+            // Add all items from subgroups to the parent's items
+            newGroup.subGroups.forEach(subGroup => {
+              allItems.push(...subGroup.items);
+            });
+            
+            // Update the group with all items and remove subgroups
+            newGroup.items = allItems;
+            newGroup.subGroups = undefined;
+          }
+          
+          return newGroup;
+        });
+        
+        // Sort all groups alphabetically by title
+        const sortedGroups = groupsToRender.sort((a, b) => 
+          a.title.toLowerCase().localeCompare(b.title.toLowerCase())
+        );
+        
+        return (
+          <>
+            {/* Add padding at the top of search results like Favorites tab */}
+            <div style={{ height: '16px', width: '100%', flexShrink: 0 }}></div>
+            {/* Render all groups alphabetically without categories */}
+            {sortedGroups.map((group: ActionGroup) => renderGroup(group))}
+            
+            {/* Show uninstalled actions toggle */}
+            <div className={styles.uninstalledToggle} onClick={toggleUninstalledItems}>
+              {toggleText}
+              {showUninstalledItems ? <ChevronUp16Regular /> : <ChevronDown16Regular />}
+            </div>
+            
+            {/* Render uninstalled items if toggle is on */}
+            {renderUninstalledItems()}
+          </>
+        );
+      }
+      
       return (
         <>
-          {/* Render by category if grouped */}
+          {/* Render by category if grouped and not searching */}
           {groupedByCategory ? (
             <>
               {groupedByCategory.map(({ category, groups }) => (
