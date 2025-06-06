@@ -434,6 +434,7 @@ interface ActionsPaneContentProps {
   setActiveTab: (tab: string) => void;
   favoriteItems?: Record<string, boolean>;
   onFavoriteChange?: (itemId: string, isFavorite: boolean) => void;
+  onSearchChange?: (query: string) => void;
 }
 
 export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
@@ -443,6 +444,7 @@ export const ActionsPaneContent: React.FC<ActionsPaneContentProps> = ({
   setActiveTab,
   favoriteItems = {},
   onFavoriteChange,
+  onSearchChange,
 }) => {
   const styles = useStyles();
   // Initialize all groups as collapsed by default
@@ -1007,8 +1009,10 @@ const renderGroup = (group: ActionGroup): JSX.Element => {
             action={
               <Button 
                 onClick={() => {
-                  // This would typically clear the search, but we need to implement this
-                  // in the parent component. For now, just switch to All tab
+                  // Clear the search query and switch to All tab
+                  if (onSearchChange) {
+                    onSearchChange('');
+                  }
                   setActiveTab('All');
                 }}
                 appearance="primary"
@@ -1277,8 +1281,10 @@ const renderGroup = (group: ActionGroup): JSX.Element => {
             action={
               <Button 
                 onClick={() => {
-                  // This would typically clear the search, but we need to implement this
-                  // in the parent component. For now, just switch to All tab
+                  // Clear the search query and switch to All tab
+                  if (onSearchChange) {
+                    onSearchChange('');
+                  }
                   setActiveTab('All');
                 }}
                 appearance="primary"

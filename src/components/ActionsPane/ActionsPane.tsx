@@ -240,6 +240,7 @@ export const ActionsPane: React.FC = () => {
           sortOrder={sortOrder}
           setActiveTab={setActiveTab}
           favoriteItems={favoriteItems}
+          onSearchChange={setSearchQuery}
           onFavoriteChange={(itemId, isFavorite) => {
             setFavoriteItems(prev => ({
               ...prev,
