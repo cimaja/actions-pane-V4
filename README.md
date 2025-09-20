@@ -1,6 +1,7 @@
 # Actions Pane V4 Redesign
 
 This project is a prototype for the redesigned Actions Pane in Power Automate Desktop, including its interaction with a Library Modal for managing built-in actions, connectors, custom actions, UI collections, and templates.
+Preview: https://cimaja.github.io/actions-pane-V4/
 
 ## Project Overview
 
